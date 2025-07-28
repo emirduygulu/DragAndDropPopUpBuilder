@@ -1,0 +1,84 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .btn {
+    @apply px-4 py-2 rounded font-medium transition-colors;
+  }
+  
+  .btn-primary {
+    @apply bg-primary-500 text-white hover:bg-primary-600;
+  }
+  
+  .btn-outline {
+    @apply border border-gray-300 text-gray-700 hover:bg-gray-100;
+  }
+  
+  .card {
+    @apply bg-white rounded-lg shadow-md;
+  }
+  
+  .input {
+    @apply px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent;
+  }
+  
+  .sidebar {
+    @apply bg-white h-full overflow-y-auto;
+  }
+  
+  .property-panel {
+    @apply bg-white h-full overflow-y-auto;
+  }
+  
+  .canvas {
+    @apply border border-gray-200 bg-white shadow-inner;
+    background-image: 
+      linear-gradient(rgba(0,0,0,0.1) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,0,0,0.1) 1px, transparent 1px);
+    background-size: 20px 20px;
+  }
+  
+  .block-item {
+    @apply border border-gray-200 rounded-md hover:border-primary-500 hover:shadow-sm cursor-grab bg-white p-2 transition-all;
+  }
+  
+  .block-item:hover {
+    @apply shadow-md transform scale-105;
+  }
+  
+  .block-item:active {
+    @apply cursor-grabbing;
+  }
+  
+  .block-item-icon {
+    @apply text-gray-500;
+  }
+  
+  .block-item:hover .block-item-icon {
+    @apply text-primary-500;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-gray-100;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-gray-300 rounded-full hover:bg-gray-400;
+}
+
+/* Shadow utilities */
+.shadow-block {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.shadow-block-selected {
+  box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.3), 0 1px 3px rgba(0, 0, 0, 0.1);
+} 

@@ -1,0 +1,138 @@
+.timeSettingsModal {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 50;
+  }
+  
+  .modalContent {
+    background-color: white;
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    max-width: 28rem;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  
+  .modalHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+  
+  .modalTitle {
+    font-size: 1.25rem;
+    font-weight: 700;
+  }
+  
+  .closeButton {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #6b7280;
+  }
+  
+  .closeButton:hover {
+    color: #374151;
+  }
+  
+  .formGroup {
+    margin-bottom: 1rem;
+  }
+  
+  .formLabel {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin-bottom: 0.25rem;
+  }
+  
+  .formControl {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.25rem;
+    background-color: #f9fafb;
+  }
+  
+  .durationInputs {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+  }
+  
+  .durationInput {
+    width: 4rem;
+    padding: 0.5rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.25rem;
+    background-color: #f9fafb;
+    text-align: center;
+  }
+  
+  .radioGroup {
+    margin-bottom: 0.5rem;
+  }
+  
+  .radioLabel {
+    display: inline-flex;
+    align-items: center;
+  }
+  
+  .radioInput {
+    margin-right: 0.5rem;
+  }
+  
+  .helpText {
+    font-size: 0.875rem;
+    color: #6b7280;
+    margin-left: 1.25rem;
+  }
+  
+  .helpList {
+    font-size: 0.875rem;
+    color: #6b7280;
+    margin-left: 1.25rem;
+    list-style-type: disc;
+    padding-left: 1.25rem;
+  }
+  
+  .resetOptions {
+    margin-left: 1.25rem;
+    margin-top: 0.5rem;
+  }
+  
+  .modalFooter {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+  }
+  
+  .cancelButton {
+    padding: 0.5rem 1rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.25rem;
+    background-color: white;
+  }
+  
+  .cancelButton:hover {
+    background-color: #f9fafb;
+  }
+  
+  .submitButton {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 0.25rem;
+    background-color: #0ea5e9;
+    color: white;
+  }
+  
+  .submitButton:hover {
+    background-color: #0284c7;
+  } 

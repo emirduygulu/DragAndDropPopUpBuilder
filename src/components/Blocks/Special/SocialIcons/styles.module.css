@@ -1,0 +1,41 @@
+.socialIconsContainer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+}
+
+.socialIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.socialIcon:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Simge şekilleri */
+.circle {
+  border-radius: 50%;
+}
+
+.square {
+  border-radius: 0;
+}
+
+.rounded {
+  border-radius: 4px;
+}
+
+/* Responsive styles */
+@media (max-width: 480px) {
+  .socialIconsContainer {
+    gap: 5px;
+  }
+} 
