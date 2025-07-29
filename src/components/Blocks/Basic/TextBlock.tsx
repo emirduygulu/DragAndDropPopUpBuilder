@@ -10,11 +10,12 @@ export const TextBlock = ({ block }: TextBlockProps) => {
   
   const renderText = () => {
     const tagName = content.tag || 'p';
+    const text = content.text || 'Sample text content. Click to edit this text block.';
     
     return React.createElement(
       tagName,
       { style },
-      content.text
+      text
     );
   };
   

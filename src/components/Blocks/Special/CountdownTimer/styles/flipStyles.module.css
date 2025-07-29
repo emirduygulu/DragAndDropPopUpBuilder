@@ -1,0 +1,100 @@
+.flipCountdownContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+}
+
+.flipUnitContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0 5px;
+  position: relative;
+}
+
+.flipCard {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  width: 60px;
+  height: 60px;
+  perspective: 600px;
+  overflow: hidden;
+  border-radius: 4px;
+}
+
+.top, .bottom {
+  height: 50%;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 24px;
+  font-weight: bold;
+  color: white;
+  background-color: #ff6b00;
+  position: relative;
+}
+
+.top {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  border-top-left-radius: inherit;
+  border-top-right-radius: inherit;
+}
+
+.bottom {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom-left-radius: inherit;
+  border-bottom-right-radius: inherit;
+}
+
+.flipCardLabel {
+  font-size: 12px;
+  color: #666;
+  margin-top: 5px;
+  text-align: center;
+}
+
+.expiredMessage {
+  font-size: 18px;
+  font-weight: bold;
+  color: #e53e3e;
+  text-align: center;
+  margin: 10px 0;
+}
+
+/* Flip animation */
+.flip {
+  animation: flip 0.5s ease-in-out;
+  transform-style: preserve-3d;
+}
+
+@keyframes flip {
+  0% {
+    transform: rotateX(0deg);
+  }
+  50% {
+    transform: rotateX(90deg);
+  }
+  100% {
+    transform: rotateX(0deg);
+  }
+}
+
+/* Responsive styles */
+@media (max-width: 480px) {
+  .flipCard {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .top, .bottom {
+    font-size: 18px;
+  }
+  
+  .flipCardLabel {
+    font-size: 10px;
+  }
+} 

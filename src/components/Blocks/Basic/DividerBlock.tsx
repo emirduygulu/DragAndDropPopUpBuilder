@@ -12,10 +12,11 @@ export const DividerBlock = ({ block }: DividerBlockProps) => {
       style={{
         ...style,
         width: '100%',
-        margin: style.margin || 0,
+        margin: style.margin || '8px 0',
         border: 'none',
-        height: style.height || '1px',
-        backgroundColor: style.backgroundColor || '#e5e7eb',
+        height: style.height || '2px',
+        backgroundColor: style.backgroundColor || '#d1d5db',
+        borderRadius: style.borderRadius || '1px',
       }}
     />
   );

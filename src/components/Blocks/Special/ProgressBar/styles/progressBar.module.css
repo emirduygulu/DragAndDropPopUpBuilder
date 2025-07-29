@@ -1,61 +1,59 @@
 .progressContainer {
   width: 100%;
-  padding: 10px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  position: relative;
 }
 
-.title {
-  font-size: 16px;
-  font-weight: bold;
-  margin-bottom: 10px;
+.progressTitle {
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 8px;
   text-align: center;
 }
 
 .progressBarContainer {
   width: 100%;
-  height: 20px;
-  background-color: #e5e7eb;
-  border-radius: 4px;
-  overflow: hidden;
-  position: relative;
-}
-
-.progressBar {
   height: 100%;
-  background-color: #3b82f6;
-  transition: width 0.3s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   position: relative;
+  overflow: hidden;
 }
 
-/* Bar shapes */
-.rounded {
-  border-radius: 4px;
+.progressBackground {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 
-.circular {
-  border-radius: 10px;
+.progressFill {
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  transition: width 0.5s ease;
 }
 
-.flat {
-  border-radius: 0;
+/* Animasyon stilleri */
+.animationLinear {
+  transition: width 0.5s linear;
 }
 
-/* Animations */
-.easeInOut {
+.animationEaseInOut {
   transition: width 0.5s ease-in-out;
 }
 
-.bounce {
-  transition: width 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+.animationBounce {
+  transition: width 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-.pulse {
-  animation: pulse 2s infinite;
+.animationPulse {
+  animation: pulse 1.5s infinite;
 }
 
-.stripes {
+.animationStripes {
   background-image: linear-gradient(
     45deg,
     rgba(255, 255, 255, 0.15) 25%,
@@ -66,13 +64,13 @@
     transparent 75%,
     transparent
   );
-  background-size: 40px 40px;
-  animation: progress-bar-stripes 2s linear infinite;
+  background-size: 1rem 1rem;
+  animation: progressStripes 1s linear infinite;
 }
 
-@keyframes progress-bar-stripes {
+@keyframes progressStripes {
   from {
-    background-position: 40px 0;
+    background-position: 1rem 0;
   }
   to {
     background-position: 0 0;
@@ -91,49 +89,68 @@
   }
 }
 
-.label {
-  color: white;
-  font-size: 12px;
+.progressLabel {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   font-weight: bold;
   z-index: 2;
   white-space: nowrap;
 }
 
-.externalLabel {
+.progressIcon {
+  margin-right: 5px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Bar şekil stilleri */
+.barShapeRounded {
+  border-radius: 4px;
+}
+
+.barShapeCircular {
+  border-radius: 999px;
+}
+
+.barShapeFlat {
+  border-radius: 0;
+}
+
+/* Gradient stil */
+.gradientFill {
+  background: linear-gradient(to right, var(--start-color), var(--end-color));
+}
+
+/* İlerleme göstergeleri */
+.progressIndicator {
+  position: absolute;
+  bottom: -20px;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
   font-size: 12px;
-  font-weight: bold;
-  margin-top: 5px;
+  color: #666;
+}
+
+.progressIndicatorStart {
   text-align: left;
 }
 
-.indicators {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 5px;
-  font-size: 12px;
-  color: #6b7280;
+.progressIndicatorEnd {
+  text-align: right;
 }
 
-.startIndicator, .endIndicator {
-  flex: 0 0 auto;
-}
-
-.icon {
-  position: absolute;
-  right: 5px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 14px;
-  color: white;
-}
-
-/* Responsive styles */
+/* Duyarlı tasarım için */
 @media (max-width: 480px) {
-  .progressBarContainer {
-    height: 15px;
+  .progressTitle {
+    font-size: 12px;
   }
   
-  .label {
-    font-size: 10px;
+  .progressLabel {
+    font-size: 12px;
   }
-} 
+}

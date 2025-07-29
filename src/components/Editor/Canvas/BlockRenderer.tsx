@@ -5,6 +5,11 @@ import { TextBlock } from '../../Blocks/Basic/TextBlock';
 import { ImageBlock } from '../../Blocks/Basic/ImageBlock';
 import { ButtonBlock } from '../../Blocks/Basic/ButtonBlock';
 import { DividerBlock } from '../../Blocks/Basic/DividerBlock';
+import { HeadingBlock } from '../../Blocks/Basic/HeadingBlock';
+import { SpacerBlock } from '../../Blocks/Basic/SpacerBlock';
+import { CloseButtonBlock } from '../../Blocks/Basic/CloseButtonBlock';
+import { GeometricBlock } from '../../Blocks/Basic/GeometricBlock';
+import { HTMLBlock } from '../../Blocks/Basic/HTMLBlock';
 import { useEffect, useRef, useState, useCallback } from 'react';
 
 // Special blocks
@@ -12,7 +17,8 @@ import { CountdownTimerBlock } from '../../Blocks/Special/CountdownTimer/Countdo
 import { VideoBlock } from '../../Blocks/Special/Video';
 import { SocialIconsBlock } from '../../Blocks/Special/SocialIcons';
 import { ProgressBarBlock } from '../../Blocks/Special/ProgressBar';
-import { GiftBoxBlock } from '../../Blocks/Special/GiftBox';
+import { GiftBoxBlock } from '../../Blocks/Prize/GiftBox';
+import { SpinWheelBlock } from '../../Blocks/Prize/Spin';
 
 // Form blocks
 import { 
@@ -44,7 +50,7 @@ export const BlockRenderer = ({ block, isSelected }: BlockRendererProps) => {
   const [startSize, setStartSize] = useState({ width: 0, height: 0 });
   const [startBlockPos, setStartBlockPos] = useState({ x: 0, y: 0 });
   
-  // We're not handling drop here anymore, just drag
+  // Drag functionality for existing blocks
   const [{ isDragging }, drag] = useDrag({
     type: 'BLOCK_INSTANCE',
     item: { id: block.id, type: 'existing' },
@@ -64,6 +70,13 @@ export const BlockRenderer = ({ block, isSelected }: BlockRendererProps) => {
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     selectBlock(block.id);
+  };
+  
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (e.button === 0) { // Left mouse button
+      e.stopPropagation();
+      selectBlock(block.id);
+    }
   };
   
   // Handle resize start
@@ -167,12 +180,22 @@ export const BlockRenderer = ({ block, isSelected }: BlockRendererProps) => {
       // Basic blocks
       case 'text':
         return <TextBlock block={block} />;
+      case 'heading':
+        return <HeadingBlock block={block} />;
       case 'image':
         return <ImageBlock block={block} />;
       case 'button':
         return <ButtonBlock block={block} />;
+      case 'close-button':
+        return <CloseButtonBlock block={block} />;
       case 'divider':
         return <DividerBlock block={block} />;
+      case 'spacer':
+        return <SpacerBlock block={block} />;
+      case 'geometric':
+        return <GeometricBlock block={block} />;
+      case 'html':
+        return <HTMLBlock block={block} />;
         
       // Special blocks
       case 'countdown-timer':
@@ -185,6 +208,8 @@ export const BlockRenderer = ({ block, isSelected }: BlockRendererProps) => {
         return <ProgressBarBlock block={block} />;
       case 'gift-box':
         return <GiftBoxBlock block={block} />;
+      case 'spin-wheel':
+        return <SpinWheelBlock block={block} />;
         
       // Form blocks
       case 'input-name':
@@ -229,7 +254,7 @@ export const BlockRenderer = ({ block, isSelected }: BlockRendererProps) => {
       }}
       className={`absolute ${
         isSelected ? 'shadow-block-selected' : 'shadow-block'
-      } ${isDragging ? 'opacity-50' : ''}`}
+      } ${isDragging ? 'block-dragging' : ''}`}
       style={{
         left: block.position.x,
         top: block.position.y,
@@ -242,14 +267,10 @@ export const BlockRenderer = ({ block, isSelected }: BlockRendererProps) => {
         borderRadius: block.style.borderRadius || '0',
         overflow: 'hidden',
         outline: 'none',
-        transition: resizing ? 'none' : 'border 0.2s ease-in-out',
+        transition: resizing ? 'none' : 'all 0.2s ease-in-out',
       }}
       onClick={handleClick}
-      onMouseDown={(e) => {
-        if (e.button === 0) { // Left mouse button
-          selectBlock(block.id);
-        }
-      }}
+      onMouseDown={handleMouseDown}
       tabIndex={0}
     >
       {renderBlockContent()}

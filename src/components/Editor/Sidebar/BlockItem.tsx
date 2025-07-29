@@ -1,7 +1,7 @@
 import { useDrag } from 'react-dnd';
 import type { BlockDefinition } from '../../../types';
 import {
-  Square, Type, Image, Minus, Columns, Code,
+  Square, Type, Image, Minus, Columns, Code, X,
   TextCursorInput, Mail, Phone, CheckSquare, Circle, ChevronDown,
   Timer, BarChart, Share2, Video, CircleDot, SquareAsterisk, Ticket, Gift
 } from 'lucide-react';
@@ -28,7 +28,7 @@ export const BlockItem = ({ block }: BlockItemProps) => {
     'circle': Circle, 'chevron-down': ChevronDown, 'timer': Timer,
     'bar-chart': BarChart, 'share2': Share2, 'video': Video,
     'circle-dot': CircleDot, 'square-asterisk': SquareAsterisk,
-    'ticket': Ticket, 'gift': Gift
+    'ticket': Ticket, 'gift': Gift, 'x': X
   };
 
   const IconComponent = iconMap[block.icon] || Square;

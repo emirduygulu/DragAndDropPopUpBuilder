@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import type { BlockInstance } from '../../../../types';
 import styles from './styles/progressBar.module.css';
 
@@ -8,154 +8,183 @@ interface ProgressBarProps {
 
 export const ProgressBarBlock = ({ block }: ProgressBarProps) => {
   const { content, style } = block;
-  const [progress, setProgress] = useState(0);
-  const progressBarRef = useRef<HTMLDivElement>(null);
   
-  // Bar tipi: manual (elle girilen), timer (zamanlayıcı), scroll (sayfa kaydırma)
-  const barType = content.barType || 'manual';
+  // Temel özellikler
+  const progress = content.progress !== undefined ? content.progress : 50;
+  const showLabel = content.showLabel !== undefined ? content.showLabel : true;
+  const labelText = content.labelText || `${progress}%`;
+  const title = content.title || '';
   
-  // Animasyon tipi: linear, ease-in-out, bounce, pulse, stripes
-  const animationType = content.animationType || 'linear';
+  // Bar tipi ve animasyon
+  const barType = content.barType || 'manual'; // 'manual', 'timer', 'scroll'
+  const animationType = content.animationType || 'linear'; // 'linear', 'easeInOut', 'bounce', 'pulse', 'stripes'
+  const barShape = content.barShape || 'rounded'; // 'flat', 'rounded', 'circular'
   
-  // Bar şekli: rounded (yuvarlatılmış), circular (dairesel), flat (düz)
-  const barShape = content.barShape || 'rounded';
+  // Renk özellikleri
+  const fillColor = content.fillColor || '#0ea5e9';
+  const backgroundColor = style.backgroundColor || '#e5e7eb';
+  const labelColor = content.labelColor || '#000000';
+  const useGradient = content.useGradient || false;
+  const gradientStartColor = content.gradientStartColor || fillColor;
+  const gradientEndColor = content.gradientEndColor || fillColor;
   
-  // Progress değerini hesapla
+  // Zamanlayıcı özellikleri
+  const duration = content.duration || 60; // saniye cinsinden
+  const [timerProgress, setTimerProgress] = useState(0);
+  
+  // Scroll özellikleri
+  const [scrollProgress, setScrollProgress] = useState(0);
+  
+  // Simge
+  const showIcon = content.showIcon || false;
+  const iconType = content.iconType || 'clock';
+  
+  // Gösterge metinleri
+  const showIndicators = content.showIndicators || false;
+  const startIndicator = content.startIndicator || '0%';
+  const endIndicator = content.endIndicator || '100%';
+  
+  // Zamanlayıcı için useEffect
   useEffect(() => {
-    if (barType === 'manual') {
-      // Manuel olarak ayarlanan progress değeri
-      setProgress(content.progress || 0);
-    } else if (barType === 'timer') {
-      // Zamanlayıcı ile otomatik ilerleyen progress
-      const duration = (content.duration || 10) * 1000; // varsayılan 10 saniye
-      const startTime = Date.now();
-      
-      const timer = setInterval(() => {
-        const elapsedTime = Date.now() - startTime;
-        const calculatedProgress = Math.min(100, (elapsedTime / duration) * 100);
-        
-        setProgress(calculatedProgress);
-        
-        if (calculatedProgress >= 100) {
-          clearInterval(timer);
-        }
-      }, 50);
-      
-      return () => clearInterval(timer);
-    } else if (barType === 'scroll') {
-      // Sayfa kaydırma ile ilerleyen progress
-      const handleScroll = () => {
-        if (!progressBarRef.current) return;
-        
-        const windowHeight = window.innerHeight;
-        const documentHeight = document.documentElement.scrollHeight - windowHeight;
-        const scrollTop = window.scrollY;
-        
-        const scrollProgress = Math.min(100, (scrollTop / documentHeight) * 100);
-        setProgress(scrollProgress);
-      };
-      
-      window.addEventListener('scroll', handleScroll);
-      handleScroll(); // İlk yükleme için çağır
-      
-      return () => window.removeEventListener('scroll', handleScroll);
-    }
-  }, [barType, content.progress, content.duration]);
+    if (barType !== 'timer') return;
+    
+    const interval = setInterval(() => {
+      setTimerProgress(prev => {
+        const newProgress = prev + (100 / duration / 10);
+        return newProgress >= 100 ? 100 : newProgress;
+      });
+    }, 100);
+    
+    return () => clearInterval(interval);
+  }, [barType, duration]);
   
-  // Gradient renk geçişi için style
-  const getGradientStyle = () => {
-    if (content.useGradient) {
-      return {
-        background: `linear-gradient(to right, ${content.gradientStartColor || '#3b82f6'}, ${content.gradientEndColor || '#8b5cf6'})`
-      };
+  // Scroll için useEffect
+  useEffect(() => {
+    if (barType !== 'scroll') return;
+    
+    const handleScroll = () => {
+      const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+      const scrollHeight = document.documentElement.scrollHeight || document.body.scrollHeight;
+      const clientHeight = document.documentElement.clientHeight || document.body.clientHeight;
+      
+      const scrolled = (scrollTop / (scrollHeight - clientHeight)) * 100;
+      setScrollProgress(Math.min(scrolled, 100));
+    };
+    
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [barType]);
+  
+  // Bar değerini hesapla
+  const calculateProgress = () => {
+    switch (barType) {
+      case 'timer':
+        return timerProgress;
+      case 'scroll':
+        return scrollProgress;
+      default:
+        return progress;
     }
-    return { backgroundColor: content.fillColor || '#3b82f6' };
   };
   
-  // Progress bar sınıflarını oluştur
-  const getProgressBarClasses = () => {
-    const classes = [styles.progressBar];
-    
-    // Bar şekli
-    if (barShape === 'rounded') classes.push(styles.rounded);
-    if (barShape === 'circular') classes.push(styles.circular);
-    if (barShape === 'flat') classes.push(styles.flat);
-    
-    // Animasyon tipi
-    if (animationType === 'ease-in-out') classes.push(styles.easeInOut);
-    if (animationType === 'bounce') classes.push(styles.bounce);
-    if (animationType === 'pulse') classes.push(styles.pulse);
-    if (animationType === 'stripes') classes.push(styles.stripes);
-    
-    return classes.join(' ');
+  const currentProgress = calculateProgress();
+  
+  // Bar şekli için class belirle
+  const getBarShapeClass = () => {
+    switch (barShape) {
+      case 'flat':
+        return styles.barShapeFlat;
+      case 'circular':
+        return styles.barShapeCircular;
+      default:
+        return styles.barShapeRounded;
+    }
   };
   
-  // İkon gösterimi
+  // Animasyon için class belirle
+  const getAnimationClass = () => {
+    switch (animationType) {
+      case 'easeInOut':
+        return styles.animationEaseInOut;
+      case 'bounce':
+        return styles.animationBounce;
+      case 'pulse':
+        return styles.animationPulse;
+      case 'stripes':
+        return styles.animationStripes;
+      default:
+        return styles.animationLinear;
+    }
+  };
+  
+  // Simge render
   const renderIcon = () => {
-    if (!content.showIcon) return null;
+    if (!showIcon) return null;
     
-    const iconType = content.iconType || 'arrow';
+    let icon = '⏱️';
+    switch (iconType) {
+      case 'star':
+        icon = '⭐';
+        break;
+      case 'gift':
+        icon = '🎁';
+        break;
+      case 'fire':
+        icon = '🔥';
+        break;
+      case 'check':
+        icon = '✅';
+        break;
+      default:
+        icon = '⏱️';
+    }
     
-    return (
-      <div className={styles.icon}>
-        {iconType === 'arrow' && '→'}
-        {iconType === 'star' && '★'}
-        {iconType === 'check' && '✓'}
-      </div>
-    );
+    return <span className={styles.progressIcon}>{icon}</span>;
   };
   
-  // Göstergeler (başlangıç/bitiş)
-  const renderIndicators = () => {
-    if (!content.showIndicators) return null;
+  // Gradient için stil
+  const getGradientStyle = () => {
+    if (!useGradient) return {};
     
-    return (
-      <div className={styles.indicators}>
-        <div className={styles.startIndicator}>{content.startIndicator || '0%'}</div>
-        <div className={styles.endIndicator}>{content.endIndicator || '100%'}</div>
-      </div>
-    );
+    return {
+      '--start-color': gradientStartColor,
+      '--end-color': gradientEndColor,
+    } as React.CSSProperties;
   };
   
   return (
-    <div 
-      className={styles.progressContainer}
-      style={style}
-      ref={progressBarRef}
-    >
-      {/* Başlık */}
-      {content.title && (
-        <div className={styles.title}>{content.title}</div>
-      )}
+    <div className={styles.progressContainer} style={style}>
+      {title && <div className={styles.progressTitle}>{title}</div>}
       
-      {/* Progress Bar */}
-      <div className={styles.progressBarContainer}>
+      <div className={`${styles.progressBarContainer} ${getBarShapeClass()}`}>
         <div 
-          className={getProgressBarClasses()}
-          style={{
-            width: `${progress}%`,
+          className={styles.progressBackground} 
+          style={{ backgroundColor }}
+        />
+        
+        <div 
+          className={`${styles.progressFill} ${getAnimationClass()} ${useGradient ? styles.gradientFill : ''}`} 
+          style={{ 
+            width: `${currentProgress}%`, 
+            backgroundColor: useGradient ? 'transparent' : fillColor,
             ...getGradientStyle()
           }}
-        >
-          {/* Bar içi etiket */}
-          {content.showLabel && progress > 15 && (
-            <span className={styles.label} style={{ color: content.labelColor || '#ffffff' }}>
-              {content.labelText || `${Math.round(progress)}%`}
-            </span>
-          )}
-          
-          {renderIcon()}
-        </div>
+        />
+        
+        {showLabel && (
+          <div className={styles.progressLabel} style={{ color: labelColor }}>
+            {renderIcon()}
+            {labelText}
+          </div>
+        )}
+        
+        {showIndicators && (
+          <div className={styles.progressIndicator}>
+            <div className={styles.progressIndicatorStart}>{startIndicator}</div>
+            <div className={styles.progressIndicatorEnd}>{endIndicator}</div>
+          </div>
+        )}
       </div>
-      
-      {/* Bar dışı etiket */}
-      {content.showLabel && progress <= 15 && (
-        <div className={styles.externalLabel} style={{ color: content.labelColor || '#333333' }}>
-          {content.labelText || `${Math.round(progress)}%`}
-        </div>
-      )}
-      
-      {renderIndicators()}
     </div>
   );
-}; 
+};

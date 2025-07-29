@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import styles from './flipStyles.module.css';
+import styles from './styles/flipStyles.module.css';
 
 interface FlipCountdownProps {
   timeLeft: {

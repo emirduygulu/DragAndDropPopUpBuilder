@@ -82,6 +82,128 @@ export interface BlockAction {
   callback?: string;
 }
 
+// Spin Wheel Types
+export interface SpinWheelSlice {
+  id: string;
+  text: string;
+  value: string;
+  probability: number; // 0-100
+  type: 'win' | 'lose';
+  color: string;
+  backgroundColor: string;
+  isActive: boolean;
+  action?: {
+    type: 'popup' | 'coupon' | 'redirect' | 'event';
+    value: string;
+    url?: string;
+  };
+}
+
+export interface SpinWheelFormField {
+  name: string;
+  type: 'text' | 'email' | 'phone' | 'number' | 'select';
+  label: string;
+  placeholder?: string;
+  show: boolean;
+  required: boolean;
+  validation?: {
+    pattern?: string;
+    minLength?: number;
+    maxLength?: number;
+  };
+}
+
+export interface SpinWheelLayout {
+  desktop: {
+    width: number;
+    height: number;
+    wheelPosition: 'left' | 'right' | 'center';
+    wheelSize: number;
+  };
+  mobile: {
+    width: number;
+    height: number;
+    wheelPosition: 'top' | 'bottom' | 'center';
+    wheelSize: number;
+  };
+}
+
+export interface SpinWheelColorTheme {
+  container: {
+    backgroundColor: string;
+    textColor: string;
+  };
+  submitButton: {
+    backgroundColor: string;
+    textColor: string;
+  };
+  wheelSlices: Array<{
+    backgroundColor: string;
+    textColor: string;
+  }>;
+  countdownBar: {
+    backgroundColor: string;
+    textColor: string;
+  };
+}
+
+export interface SpinWheelTexts {
+  headline: string;
+  description: string;
+  disclaimer: string;
+  submitButton: string;
+  closeLink: string;
+  winningHeadline: string;
+  losingHeadline: string;
+  winningMessage: string;
+  losingMessage: string;
+}
+
+export interface SpinWheelSettings {
+  // Layout
+  layout: SpinWheelLayout;
+  
+  // Colors
+  colorTheme: SpinWheelColorTheme;
+  
+  // Texts
+  texts: SpinWheelTexts;
+  
+  // Form
+  formFields: SpinWheelFormField[];
+  validateEmails: boolean;
+  preventEmailDuplicates: boolean;
+  consentCheckbox: {
+    show: boolean;
+    text: string;
+  };
+  
+  // Logos
+  bigLogo?: string;
+  smallLogo?: string;
+  
+  // Wheel settings
+  sliceCount: number; // 2-20
+  borderWidth: number;
+  borderColor: string;
+  borderStyle: 'solid' | 'dashed' | 'dotted';
+  spinDuration: number; // milliseconds
+  spinEasing: 'ease-out' | 'ease-in-out' | 'linear';
+  
+  // Behavior
+  spinLimit: 'once' | 'daily' | 'unlimited';
+  triggerType: 'auto' | 'button' | 'scroll';
+  triggerDelay: number; // seconds
+  
+  // Display settings
+  showOnDesktop: boolean;
+  showOnMobile: boolean;
+  showOnExit: boolean;
+  
+  // User frequency
+  showToSameUser: 'once' | 'daily' | 'weekly' | 'monthly' | 'unlimited';
+}
+
 // Block Instance
 export interface BlockInstance {
   id: string;

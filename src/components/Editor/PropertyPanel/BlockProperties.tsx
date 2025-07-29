@@ -1,6 +1,8 @@
 import type { BlockInstance } from '../../../types';
 import { GiftBoxProperties } from './Properties/GiftBox';
 import { CountdownProperties } from './Properties/Countdown/CountdownProperties';
+import { ProgressBarProperties } from './Properties/Progress/ProgressBarProperties';
+import { SpinWheelProperties } from './Properties/Spin';
 import { useBuilderStore } from '../../../store/builderStore';
 import { useState, useRef } from 'react';
 
@@ -33,11 +35,13 @@ export const BlockProperties = ({ block }: BlockPropertiesProps) => {
       case 'countdown-timer':
         return <CountdownProperties block={block} />;
       case 'progress-bar':
+        return <ProgressBarProperties block={block} />;
       case 'social-icons':
       case 'video':
-      case 'spin-wheel':
         // Geçici olarak genel özellikler panelini kullan
         return renderBasicBlockProperties(block);
+      case 'spin-wheel':
+        return <SpinWheelProperties block={block} />;
         
       // Basic bileşenler - Genel özellikler paneli
       case 'text':

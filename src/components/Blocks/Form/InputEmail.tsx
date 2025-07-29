@@ -23,7 +23,7 @@ export const InputEmailBlock = ({ block }: InputEmailProps) => {
       const [property, value] = rule.split(':').map((part) => part.trim());
       if (property && value) {
         // CSS özelliklerini camelCase formatına dönüştür (React inline style için)
-        const formattedProperty = property.replace(/-([a-z])/g, (match, letter) => letter.toUpperCase());
+        const formattedProperty = property.replace(/-([a-z])/g, (_match, letter) => letter.toUpperCase());
         customStyles[formattedProperty] = value;
       }
     });

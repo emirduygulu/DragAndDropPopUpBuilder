@@ -23,7 +23,7 @@ export const InputAddressBlock = ({ block }: InputAddressProps) => {
       const [property, value] = rule.split(':').map((part) => part.trim());
       if (property && value) {
         // CSS özelliklerini camelCase formatına dönüştür (React inline style için)
-        const formattedProperty = property.replace(/-([a-z])/g, (match, letter) => letter.toUpperCase());
+        const formattedProperty = property.replace(/-([a-z])/g, (_match, letter) => letter.toUpperCase());
         customStyles[formattedProperty] = value;
       }
     });
@@ -61,7 +61,7 @@ export const InputAddressBlock = ({ block }: InputAddressProps) => {
           id={`input-address-${block.id}`}
           placeholder={content.placeholder || 'Adres giriniz'}
           required={content.required}
-          rows={content.rows || 4}
+          rows={content.rows || 2}
           style={{
             width: '100%',
             padding: '8px 12px',
@@ -72,7 +72,7 @@ export const InputAddressBlock = ({ block }: InputAddressProps) => {
             backgroundColor: style.backgroundColor || '#ffffff',
             fontFamily: style.fontFamily || 'inherit',
             resize: 'vertical',
-            minHeight: '80px',
+            minHeight: '50px',
             ...parseCustomCSS()
           }}
           onInvalid={handleInvalid}

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import type { BlockInstance } from '../../../../types';
 import { FlipCountdown } from './FlipCountdown';
-import styles from './flipStyles.module.css';
+import styles from './styles/styles.module.css';
 
 interface CountdownTimerProps {
   block: BlockInstance;
