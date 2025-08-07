@@ -17,51 +17,50 @@ export const SpinWheelBlock = ({ block }: SpinWheelBlockProps) => {
   const [formData, setFormData] = useState<Record<string, string>>({});
   const [consentChecked, setConsentChecked] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [deviceMode, setDeviceMode] = useState<'desktop' | 'mobile'>('desktop');
   
   // Varsayılan ayarlar
   const settings: SpinWheelSettings = content.settings || {
     layout: {
-      desktop: { width: 800, height: 600, wheelPosition: 'left', wheelSize: 300 },
-      mobile: { width: 400, height: 700, wheelPosition: 'top', wheelSize: 250 }
+      desktop: { width: 500, height: 400, wheelPosition: 'left', wheelSize: 200 },
+      mobile: { width: 360, height: 450, wheelPosition: 'top', wheelSize: 180 }
     },
     colorTheme: {
-      container: { backgroundColor: '#0077CB', textColor: '#FFFFFF' },
-      submitButton: { backgroundColor: '#FC8289', textColor: '#FFFFFF' },
+      container: { backgroundColor: '#ffffff', textColor: '#1f2937' },
+      submitButton: { backgroundColor: '#8b5cf6', textColor: '#ffffff' },
       wheelSlices: [
-        { backgroundColor: '#F2EBCD', textColor: '#000000' },
-        { backgroundColor: '#57413A', textColor: '#FFFFFF' },
-        { backgroundColor: '#9CCDC3', textColor: '#000000' },
-        { backgroundColor: '#FC8289', textColor: '#000000' }
+        { backgroundColor: '#8b5cf6', textColor: '#ffffff' },
+        { backgroundColor: '#ffffff', textColor: '#1f2937' },
+        { backgroundColor: '#8b5cf6', textColor: '#ffffff' },
+        { backgroundColor: '#ffffff', textColor: '#1f2937' },
+        { backgroundColor: '#8b5cf6', textColor: '#ffffff' },
+        { backgroundColor: '#ffffff', textColor: '#1f2937' }
       ],
-      countdownBar: { backgroundColor: '#0077CB', textColor: '#FFFFFF' }
+      countdownBar: { backgroundColor: '#8b5cf6', textColor: '#ffffff' }
     },
     texts: {
-      headline: 'Our store\'s special bonus unlocked!',
-      description: 'You have a chance to win a nice big fat discount. Are you feeling lucky? Give it a spin.',
-      disclaimer: 'You can spin the wheel only once.\nIf you win, coupon can be claimed for 15 mins only!\nSame email must be used when ordering.',
-      submitButton: 'TRY YOUR LUCK',
+      headline: 'Spin for Exclusive Rewards!',
+      description: 'Enter your email and spin the wheel to unlock amazing discounts and prizes. Don\'t wait—your chance to win is just a spin away!',
+      disclaimer: 'By subscribing, you agree to receive marketing emails from us. Unsubscribe anytime. See our Privacy Policy for details.',
+      submitButton: 'Spin Now',
       closeLink: 'No, I don\'t feel lucky',
-      winningHeadline: 'Hurrah! You\'ve hit [coupon]. Lucky day!',
+      winningHeadline: 'Congratulations! You won:',
       losingHeadline: 'Better luck next time!',
-      winningMessage: 'Congratulations! You won:',
-      losingMessage: 'Sorry, try again next time!'
+      winningMessage: 'You\'ve unlocked an amazing reward!',
+      losingMessage: 'Don\'t worry, you can try again!'
     },
     formFields: [
-      { name: 'fullName', type: 'text', label: 'Your full name', placeholder: 'Enter your full name', show: false, required: false },
-      { name: 'email', type: 'email', label: 'Your email address', placeholder: 'Enter your email', show: true, required: true },
-      { name: 'phone', type: 'phone', label: 'Your phone number', placeholder: 'Enter your phone', show: false, required: false },
-      { name: 'city', type: 'text', label: 'Your city', placeholder: 'Enter your city', show: false, required: false },
-      { name: 'zipCode', type: 'text', label: 'Your ZIP code', placeholder: 'Enter ZIP code', show: false, required: false }
+      { name: 'email', type: 'email', label: 'Email', placeholder: 'Enter your email', show: true, required: true }
     ],
     validateEmails: false,
     preventEmailDuplicates: false,
     consentCheckbox: {
       show: false,
-      text: 'I do wish to accept discounts and marketing offers to be sent to my email address.'
+      text: 'I agree to receive marketing emails.'
     },
-    sliceCount: 8,
+    sliceCount: 6,
     borderWidth: 2,
-    borderColor: '#000000',
+    borderColor: '#8b5cf6',
     borderStyle: 'solid',
     spinDuration: 4000,
     spinEasing: 'ease-out',
@@ -76,14 +75,12 @@ export const SpinWheelBlock = ({ block }: SpinWheelBlockProps) => {
   
   // Varsayılan dilimler
   const defaultSlices: SpinWheelSlice[] = [
-    { id: '1', text: 'Sorry!', value: 'Losing Slice', probability: 0, type: 'lose', color: '#FFFFFF', backgroundColor: '#F2EBCD', isActive: true },
-    { id: '2', text: '50% OFF', value: 'DISCOUNT50', probability: 10, type: 'win', color: '#FFFFFF', backgroundColor: '#57413A', isActive: true },
-    { id: '3', text: 'Nothing', value: 'Losing Slice', probability: 0, type: 'lose', color: '#000000', backgroundColor: '#9CCDC3', isActive: true },
-    { id: '4', text: '40% OFF', value: 'DISCOUNT40', probability: 20, type: 'win', color: '#000000', backgroundColor: '#FC8289', isActive: true },
-    { id: '5', text: 'Almost', value: 'Losing Slice', probability: 0, type: 'lose', color: '#FFFFFF', backgroundColor: '#F2EBCD', isActive: true },
-    { id: '6', text: '30% OFF', value: 'DISCOUNT30', probability: 30, type: 'win', color: '#FFFFFF', backgroundColor: '#57413A', isActive: true },
-    { id: '7', text: 'No luck today', value: 'Losing Slice', probability: 0, type: 'lose', color: '#000000', backgroundColor: '#9CCDC3', isActive: true },
-    { id: '8', text: '20% OFF', value: 'DISCOUNT20', probability: 40, type: 'win', color: '#000000', backgroundColor: '#FC8289', isActive: true }
+    { id: '1', text: '15%', value: 'DISCOUNT15', probability: 25, type: 'win', color: '#ffffff', backgroundColor: '#8b5cf6', isActive: true },
+    { id: '2', text: '5%', value: 'DISCOUNT5', probability: 15, type: 'win', color: '#1f2937', backgroundColor: '#ffffff', isActive: true },
+    { id: '3', text: '10%', value: 'DISCOUNT10', probability: 20, type: 'win', color: '#ffffff', backgroundColor: '#8b5cf6', isActive: true },
+    { id: '4', text: '15%', value: 'DISCOUNT15', probability: 25, type: 'win', color: '#1f2937', backgroundColor: '#ffffff', isActive: true },
+    { id: '5', text: '5%', value: 'DISCOUNT5', probability: 15, type: 'win', color: '#ffffff', backgroundColor: '#8b5cf6', isActive: true },
+    { id: '6', text: '10%', value: 'DISCOUNT10', probability: 20, type: 'win', color: '#1f2937', backgroundColor: '#ffffff', isActive: true }
   ];
   
   const slices: SpinWheelSlice[] = content.slices || defaultSlices;
@@ -92,7 +89,9 @@ export const SpinWheelBlock = ({ block }: SpinWheelBlockProps) => {
   // Responsive kontrol
   useEffect(() => {
     const checkMobile = () => {
-      setIsMobile(window.innerWidth <= 768);
+      const mobile = window.innerWidth <= 768;
+      setIsMobile(mobile);
+      setDeviceMode(mobile ? 'mobile' : 'desktop');
     };
     
     checkMobile();
@@ -119,7 +118,7 @@ export const SpinWheelBlock = ({ block }: SpinWheelBlockProps) => {
     
     const centerX = canvas.width / 2;
     const centerY = canvas.height / 2;
-    const radius = Math.min(centerX, centerY) - 10;
+    const radius = Math.min(centerX, centerY) - 15;
     
     // Canvas'ı temizle
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -153,10 +152,10 @@ export const SpinWheelBlock = ({ block }: SpinWheelBlockProps) => {
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillStyle = slice.color;
-      ctx.font = 'bold 14px Arial, sans-serif';
+      ctx.font = 'bold 16px Arial, sans-serif';
       
       // Metni dilim içinde konumlandır
-      const textRadius = radius * 0.7;
+      const textRadius = radius * 0.6;
       ctx.fillText(slice.text, textRadius, 0);
       ctx.restore();
     });
@@ -269,12 +268,12 @@ export const SpinWheelBlock = ({ block }: SpinWheelBlockProps) => {
   };
   
   // Layout hesaplamaları
-  const currentLayout = isMobile ? settings.layout.mobile : settings.layout.desktop;
+  const currentLayout = deviceMode === 'mobile' ? settings.layout.mobile : settings.layout.desktop;
   const wheelSize = currentLayout.wheelSize;
   
   return (
     <div 
-      className={`${styles.spinWheelContainer} ${isMobile ? styles.mobile : styles.desktop}`}
+      className={`${styles.spinWheelContainer} ${deviceMode === 'mobile' ? styles.mobile : styles.desktop}`}
       style={{
         width: currentLayout.width,
         height: currentLayout.height,
@@ -283,14 +282,14 @@ export const SpinWheelBlock = ({ block }: SpinWheelBlockProps) => {
         ...style
       }}
     >
-      {/* Logo */}
-      {settings.bigLogo && (
-        <div className={styles.bigLogo}>
-          <img src={settings.bigLogo} alt="Logo" />
-        </div>
-      )}
+
       
-      <div className={`${styles.contentWrapper} ${isMobile ? styles.mobileLayout : styles.desktopLayout}`}>
+      {/* Close Button */}
+      <button className={styles.closeButton}>
+        <span>×</span>
+      </button>
+      
+      <div className={`${styles.contentWrapper} ${deviceMode === 'mobile' ? styles.mobileLayout : styles.desktopLayout}`}>
         {/* Sol/Top Panel - Çark */}
         <div className={`${styles.wheelSection} ${styles[`wheel${currentLayout.wheelPosition}`]}`}>
           <canvas
@@ -309,21 +308,12 @@ export const SpinWheelBlock = ({ block }: SpinWheelBlockProps) => {
           <h1 className={styles.headline}>{settings.texts.headline}</h1>
           <p className={styles.description}>{settings.texts.description}</p>
           
-          <div className={styles.disclaimer}>
-            {settings.texts.disclaimer.split('\n').map((line, index) => (
-              <div key={index} className={styles.disclaimerItem}>
-                • {line}
-              </div>
-            ))}
-          </div>
-          
           {/* Form Alanları */}
           <div className={styles.formSection}>
             {settings.formFields
               .filter(field => field.show)
               .map(field => (
                 <div key={field.name} className={styles.formField}>
-                  <label>{field.label}</label>
                   <input
                     type={field.type}
                     placeholder={field.placeholder}
@@ -363,9 +353,9 @@ export const SpinWheelBlock = ({ block }: SpinWheelBlockProps) => {
             {isSpinning ? 'Spinning...' : settings.texts.submitButton}
           </button>
           
-          {/* Close Link */}
-          <div className={styles.closeLink}>
-            {settings.texts.closeLink} <span className={styles.closeIcon}>×</span>
+          {/* Disclaimer */}
+          <div className={styles.disclaimer}>
+            {settings.texts.disclaimer}
           </div>
         </div>
       </div>
@@ -376,7 +366,7 @@ export const SpinWheelBlock = ({ block }: SpinWheelBlockProps) => {
           <div className={styles.resultContent}>
             <h3>
               {result.type === 'win' 
-                ? settings.texts.winningHeadline.replace('[coupon]', result.value)
+                ? settings.texts.winningHeadline
                 : settings.texts.losingHeadline
               }
             </h3>
@@ -391,7 +381,7 @@ export const SpinWheelBlock = ({ block }: SpinWheelBlockProps) => {
             )}
             
             <div className={styles.resultActions}>
-              <button onClick={closeResult} className={styles.closeButton}>
+              <button onClick={closeResult} className={styles.closeResultButton}>
                 Close
               </button>
             </div>

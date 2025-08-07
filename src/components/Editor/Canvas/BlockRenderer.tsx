@@ -22,6 +22,7 @@ import { SpinWheelBlock } from '../../Blocks/Prize/Spin';
 
 // Form blocks
 import { 
+  FormContainerBlock,
   InputNameBlock, 
   InputEmailBlock, 
   InputPhoneBlock,
@@ -212,6 +213,8 @@ export const BlockRenderer = ({ block, isSelected }: BlockRendererProps) => {
         return <SpinWheelBlock block={block} />;
         
       // Form blocks
+      case 'input-form':
+        return <FormContainerBlock block={block} />;
       case 'input-name':
         return <InputNameBlock block={block} />;
       case 'input-email':
@@ -243,6 +246,19 @@ export const BlockRenderer = ({ block, isSelected }: BlockRendererProps) => {
         );
     }
   };
+
+  const isFormElement = block.type === 'input-form' || 
+                         block.type === 'input-name' || 
+                         block.type === 'input-email' || 
+                         block.type === 'input-phone' || 
+                         block.type === 'input-city' || 
+                         block.type === 'input-gender' || 
+                         block.type === 'input-address' || 
+                         block.type === 'input-date' || 
+                         block.type === 'dropdown-city' || 
+                         block.type === 'checkbox-consent' || 
+                         block.type === 'radio-consent' || 
+                         block.type === 'submit-button';
   
   return (
     <div
@@ -267,7 +283,13 @@ export const BlockRenderer = ({ block, isSelected }: BlockRendererProps) => {
         borderRadius: block.style.borderRadius || '0',
         overflow: 'hidden',
         outline: 'none',
-        transition: resizing ? 'none' : 'all 0.2s ease-in-out',
+        // Form elementleri için özel stil
+        ...(isFormElement && {
+          border: '1px solid #e5e7eb',
+          borderRadius: '4px',
+          backgroundColor: '#ffffff',
+          boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+        })
       }}
       onClick={handleClick}
       onMouseDown={handleMouseDown}

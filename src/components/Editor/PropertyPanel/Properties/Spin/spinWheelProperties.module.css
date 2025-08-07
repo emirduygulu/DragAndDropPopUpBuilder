@@ -5,6 +5,44 @@
   flex-direction: column;
 }
 
+/* Device Mode Selector */
+.deviceModeSelector {
+  padding: 16px;
+  border-bottom: 1px solid #e5e7eb;
+  background: #f9fafb;
+}
+
+.deviceButtons {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.deviceButton {
+  flex: 1;
+  padding: 10px 12px;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+.deviceButton:hover {
+  border-color: #8b5cf6;
+  color: #8b5cf6;
+}
+
+.deviceButton.active {
+  background: #8b5cf6;
+  color: white;
+  border-color: #8b5cf6;
+}
+
 .tabNavigation {
   display: flex;
   flex-wrap: wrap;

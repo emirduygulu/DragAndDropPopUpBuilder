@@ -10,7 +10,7 @@ interface CanvasProps {
 }
 
 const Canvas = ({ className = '' }: CanvasProps) => {
-  const { blocks, canvasSettings, addBlock, selectBlock, selectedBlockId } = useBuilderStore();
+  const { blocks, canvasSettings, addBlock, selectBlock, selectedBlockId, setCanvasSettings } = useBuilderStore();
   const [isDraggingOver, setIsDraggingOver] = useState(false);
   const [showCrosshair, setShowCrosshair] = useState(true);
   const [showGrid, setShowGrid] = useState(true);
@@ -43,19 +43,104 @@ const Canvas = ({ className = '' }: CanvasProps) => {
           }
         }
         
-        const blockWidth = blockDefinition?.defaultSize?.width || 200;
-        const blockHeight = blockDefinition?.defaultSize?.height || 100;
-        const centeredX = x - (blockWidth / 2);
-        const centeredY = y - (blockHeight / 2);
-        
-        addBlock({
-          type: item.blockType,
-          content: blockDefinition?.defaultContent || {},
-          style: blockDefinition?.defaultStyle || {},
-          position: { x: centeredX, y: centeredY },
-          size: { width: blockWidth, height: blockHeight },
-          zIndex: 1,
-        });
+// Form elementleri için özel davranış
+const isFormElementList = [
+  'input-name', 'input-email', 'input-phone', 'input-city', 
+  'input-gender', 'input-address', 'input-date', 'dropdown-city',
+  'checkbox-consent', 'radio-consent', 'submit-button'
+];
+
+const isFormElement = isFormElementList.includes(item.blockType);
+
+if (isFormElement) {
+  // Form container'ı bul
+  const formContainer = blocks.find(block => block.type === 'input-form');
+
+  const blockWidth = blockDefinition?.defaultSize?.width || 200;
+  const blockHeight = blockDefinition?.defaultSize?.height || 100;
+  const verticalSpacing = 10;
+
+  if (!formContainer) {
+    // Form container yoksa, normal element gibi ekle (bırakıldığı yere göre)
+    const centeredX = x - (blockWidth / 2);
+    const centeredY = y - (blockHeight / 2);
+
+    addBlock({
+      type: item.blockType,
+      content: blockDefinition?.defaultContent || {},
+      style: blockDefinition?.defaultStyle || {},
+      position: { x: centeredX, y: centeredY },
+      size: { width: blockWidth, height: blockHeight },
+      zIndex: 1,
+    });
+  } else {
+    // Form container varsa, form alanlarını alt alta hizalı ekle
+    const formElements = blocks.filter(block => 
+      block.type !== 'input-form' && isFormElementList.includes(block.type)
+    );
+
+    // Y'ye göre sıralama
+    const sortedFormElements = formElements.sort((a, b) => a.position.y - b.position.y);
+    const lastElement = sortedFormElements[sortedFormElements.length - 1];
+
+    // Yeni form elemanının y konumu: en alt bloğun altı
+    const newY = lastElement
+      ? lastElement.position.y + lastElement.size.height + verticalSpacing
+      : formContainer.position.y + 60;
+
+    const newX = formContainer.position.x + 20;
+
+    addBlock({
+      type: item.blockType,
+      content: blockDefinition?.defaultContent || {},
+      style: {
+        ...blockDefinition?.defaultStyle || {},
+        border: '1px solid #e5e7eb',
+        borderRadius: '4px',
+        backgroundColor: '#ffffff',
+        margin: '0 0 10px 0'
+      },
+      position: { x: newX, y: newY },
+      size: { width: blockWidth, height: blockHeight },
+      zIndex: 2,
+    });
+
+    // Form container yüksekliğini güncelle
+    const totalFormElements = formElements.length + 1;
+    const newFormHeight = Math.max(350, 80 + (totalFormElements * (blockHeight + verticalSpacing)) + 20);
+
+    const { updateBlock } = useBuilderStore.getState();
+    updateBlock(formContainer.id, {
+      size: { 
+        width: formContainer.size.width, 
+        height: newFormHeight 
+      }
+    });
+  }
+} else {
+          // Normal elementler için mevcut davranış
+          const blockWidth = blockDefinition?.defaultSize?.width || 200;
+          const blockHeight = blockDefinition?.defaultSize?.height || 100;
+          const centeredX = x - (blockWidth / 2);
+          const centeredY = y - (blockHeight / 2);
+          
+          // Spin Wheel için canvas boyutunu otomatik ayarla
+          if (item.blockType === 'spin-wheel') {
+            setCanvasSettings({
+              width: 500,
+              height: 400
+            });
+          }
+          
+          addBlock({
+            type: item.blockType,
+            content: blockDefinition?.defaultContent || {},
+            style: blockDefinition?.defaultStyle || {},
+            position: { x: centeredX, y: centeredY },
+            size: { width: blockWidth, height: blockHeight },
+            zIndex: 1,
+          });
+        }
       } else if (item.type === 'existing') {
         // Handle moving existing blocks - center the block on mouse cursor
         const { moveBlock } = useBuilderStore.getState();

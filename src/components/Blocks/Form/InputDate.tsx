@@ -67,6 +67,7 @@ export const InputDateBlock = ({ block }: InputDateProps) => {
           required={content.required}
           min={minDate}
           max={maxDate}
+          placeholder={content.placeholder || 'Doğum tarihi seçiniz'}
           style={{
             width: '100%',
             padding: '8px 12px',

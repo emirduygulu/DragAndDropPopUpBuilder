@@ -10,50 +10,49 @@ interface SpinWheelPropertiesProps {
 export const SpinWheelProperties = ({ block }: SpinWheelPropertiesProps) => {
   const { updateBlockContent } = useBuilderStore();
   const [activeTab, setActiveTab] = useState<'logos' | 'form' | 'text' | 'rewards' | 'colors' | 'placement'>('logos');
+  const [deviceMode, setDeviceMode] = useState<'desktop' | 'mobile'>('desktop');
   
   const settings: SpinWheelSettings = block.content.settings || {
-    layout: {
-      desktop: { width: 800, height: 600, wheelPosition: 'left', wheelSize: 300 },
-      mobile: { width: 400, height: 700, wheelPosition: 'top', wheelSize: 250 }
-    },
-    colorTheme: {
-      container: { backgroundColor: '#0077CB', textColor: '#FFFFFF' },
-      submitButton: { backgroundColor: '#FC8289', textColor: '#FFFFFF' },
-      wheelSlices: [
-        { backgroundColor: '#F2EBCD', textColor: '#000000' },
-        { backgroundColor: '#57413A', textColor: '#FFFFFF' },
-        { backgroundColor: '#9CCDC3', textColor: '#000000' },
-        { backgroundColor: '#FC8289', textColor: '#000000' }
+          layout: {
+        desktop: { width: 500, height: 400, wheelPosition: 'left', wheelSize: 200 },
+        mobile: { width: 360, height: 450, wheelPosition: 'top', wheelSize: 180 }
+      },
+          colorTheme: {
+        container: { backgroundColor: '#ffffff', textColor: '#1f2937' },
+        submitButton: { backgroundColor: '#8b5cf6', textColor: '#ffffff' },
+        wheelSlices: [
+          { backgroundColor: '#8b5cf6', textColor: '#ffffff' },
+          { backgroundColor: '#ffffff', textColor: '#1f2937' },
+          { backgroundColor: '#8b5cf6', textColor: '#ffffff' },
+          { backgroundColor: '#ffffff', textColor: '#1f2937' },
+          { backgroundColor: '#8b5cf6', textColor: '#ffffff' },
+          { backgroundColor: '#ffffff', textColor: '#1f2937' }
+        ],
+        countdownBar: { backgroundColor: '#8b5cf6', textColor: '#ffffff' }
+      },
+          texts: {
+        headline: 'Spin for Exclusive Rewards!',
+        description: 'Enter your email and spin the wheel to unlock amazing discounts and prizes. Don\'t wait—your chance to win is just a spin away!',
+        disclaimer: 'By subscribing, you agree to receive marketing emails from us. Unsubscribe anytime. See our Privacy Policy for details.',
+        submitButton: 'Spin Now',
+        closeLink: 'No, I don\'t feel lucky',
+        winningHeadline: 'Congratulations! You won:',
+        losingHeadline: 'Better luck next time!',
+        winningMessage: 'You\'ve unlocked an amazing reward!',
+        losingMessage: 'Don\'t worry, you can try again!'
+      },
+          formFields: [
+        { name: 'email', type: 'email', label: 'Email', placeholder: 'Enter your email', show: true, required: true }
       ],
-      countdownBar: { backgroundColor: '#0077CB', textColor: '#FFFFFF' }
-    },
-    texts: {
-      headline: 'Our store\'s special bonus unlocked!',
-      description: 'You have a chance to win a nice big fat discount. Are you feeling lucky? Give it a spin.',
-      disclaimer: 'You can spin the wheel only once.\nIf you win, coupon can be claimed for 15 mins only!\nSame email must be used when ordering.',
-      submitButton: 'TRY YOUR LUCK',
-      closeLink: 'No, I don\'t feel lucky',
-      winningHeadline: 'Hurrah! You\'ve hit [coupon]. Lucky day!',
-      losingHeadline: 'Better luck next time!',
-      winningMessage: 'Congratulations! You won:',
-      losingMessage: 'Sorry, try again next time!'
-    },
-    formFields: [
-      { name: 'fullName', type: 'text', label: 'Your full name', placeholder: 'Enter your full name', show: false, required: false },
-      { name: 'email', type: 'email', label: 'Your email address', placeholder: 'Enter your email', show: true, required: true },
-      { name: 'phone', type: 'phone', label: 'Your phone number', placeholder: 'Enter your phone', show: false, required: false },
-      { name: 'city', type: 'text', label: 'Your city', placeholder: 'Enter your city', show: false, required: false },
-      { name: 'zipCode', type: 'text', label: 'Your ZIP code', placeholder: 'Enter ZIP code', show: false, required: false }
-    ],
     validateEmails: false,
     preventEmailDuplicates: false,
     consentCheckbox: {
       show: false,
       text: 'I do wish to accept discounts and marketing offers to be sent to my email address.'
     },
-    sliceCount: 8,
+          sliceCount: 6,
     borderWidth: 2,
-    borderColor: '#000000',
+          borderColor: '#8b5cf6',
     borderStyle: 'solid',
     spinDuration: 4000,
     spinEasing: 'ease-out',
@@ -114,6 +113,25 @@ export const SpinWheelProperties = ({ block }: SpinWheelPropertiesProps) => {
   
   return (
     <div className={styles.container}>
+      {/* Device Mode Selector */}
+      <div className={styles.deviceModeSelector}>
+        <h3 className={styles.sectionTitle}>Device Mode</h3>
+        <div className={styles.deviceButtons}>
+          <button
+            className={`${styles.deviceButton} ${deviceMode === 'desktop' ? styles.active : ''}`}
+            onClick={() => setDeviceMode('desktop')}
+          >
+            🖥️ Desktop (500x400)
+          </button>
+          <button
+            className={`${styles.deviceButton} ${deviceMode === 'mobile' ? styles.active : ''}`}
+            onClick={() => setDeviceMode('mobile')}
+          >
+            📱 Mobile (360x450)
+          </button>
+        </div>
+      </div>
+      
       {/* Tab Navigation */}
       <div className={styles.tabNavigation}>
         <button

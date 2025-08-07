@@ -48,10 +48,9 @@ export const InputGenderBlock = ({ block }: InputGenderProps) => {
   // Cinsiyet seçenekleri
   const genderOptions: GenderOption[] = content.options || [
     { value: '', label: 'Seçiniz' },
-    { value: 'female', label: 'Kadın' },
-    { value: 'male', label: 'Erkek' },
-    { value: 'other', label: 'Diğer' },
-    { value: 'prefer_not_to_say', label: 'Belirtmek İstemiyorum' }
+    { value: 'erkek', label: 'Erkek' },
+    { value: 'kadin', label: 'Kadın' },
+    { value: 'diger', label: 'Diğer' }
   ];
   
   return (

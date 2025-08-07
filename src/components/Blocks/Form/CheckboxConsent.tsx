@@ -67,7 +67,7 @@ export const CheckboxConsentBlock = ({ block }: CheckboxConsentProps) => {
               cursor: 'pointer'
             }}
           >
-            {content.text || 'Kullanım koşullarını ve gizlilik politikasını kabul ediyorum.'}
+            {content.label || 'Şartlar ve koşulları kabul ediyorum'}
             {content.required && <span style={{ color: '#e53e3e', marginLeft: '3px' }}>*</span>}
           </label>
         </div>

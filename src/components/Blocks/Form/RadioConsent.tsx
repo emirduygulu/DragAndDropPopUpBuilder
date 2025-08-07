@@ -8,11 +8,10 @@ interface RadioConsentProps {
 export const RadioConsentBlock = ({ block }: RadioConsentProps) => {
   const { content, style } = block;
   
-  const label = content.label || 'İletişim Tercihi';
+  const label = content.label || 'Pazarlama e-postaları almak istiyor musunuz?';
   const options = content.options || [
-    'E-posta ile iletişim kurmayı kabul ediyorum',
-    'SMS ile iletişim kurmayı kabul ediyorum',
-    'İletişim kurmak istemiyorum'
+    'Evet',
+    'Hayır'
   ];
   const required = content.required || false;
   const id = `radio-consent-${block.id}`;
