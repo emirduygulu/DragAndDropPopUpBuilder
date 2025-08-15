@@ -43,81 +43,90 @@ const Canvas = ({ className = '' }: CanvasProps) => {
           }
         }
         
-// Form elementleri için özel davranış
-const isFormElementList = [
-  'input-name', 'input-email', 'input-phone', 'input-city', 
-  'input-gender', 'input-address', 'input-date', 'dropdown-city',
-  'checkbox-consent', 'radio-consent', 'submit-button'
-];
+        // Form elementleri için özel davranış
+        const isFormElementList = [
+          'input-name', 'input-email', 'input-phone', 'input-city', 
+          'input-gender', 'input-address', 'input-date', 'dropdown-city',
+          'checkbox-consent', 'radio-consent', 'submit-button'
+        ];
+        
+        const isFormElement = isFormElementList.includes(item.blockType);
+        
+        if (isFormElement) {
+          // Form container'ı bul
+          const formContainer = blocks.find(block => block.type === 'input-form');
 
-const isFormElement = isFormElementList.includes(item.blockType);
+          // Varsayılan genişlik ve hizalama ayarları
+          const defaultWidth = 300; // Varsayılan genişlik
+          const defaultX = formContainer ? formContainer.position.x + 20 : x - (defaultWidth / 2); // Varsayılan x konumu
 
-if (isFormElement) {
-  // Form container'ı bul
-  const formContainer = blocks.find(block => block.type === 'input-form');
+          const blockWidth = blockDefinition?.defaultSize?.width || defaultWidth;
+          const blockHeight = blockDefinition?.defaultSize?.height || 100;
+          const verticalSpacing = 10;
 
-  const blockWidth = blockDefinition?.defaultSize?.width || 200;
-  const blockHeight = blockDefinition?.defaultSize?.height || 100;
-  const verticalSpacing = 10;
+          if (!formContainer) {
+            // Form container yoksa, normal element gibi ekle (bırakıldığı yere göre)
+            const centeredX = defaultX;
+            const centeredY = y - (blockHeight / 2);
 
-  if (!formContainer) {
-    // Form container yoksa, normal element gibi ekle (bırakıldığı yere göre)
-    const centeredX = x - (blockWidth / 2);
-    const centeredY = y - (blockHeight / 2);
+            addBlock({
+              type: item.blockType,
+              content: blockDefinition?.defaultContent || {},
+              style: blockDefinition?.defaultStyle || {},
+              position: { x: centeredX, y: centeredY },
+              size: { width: blockWidth, height: blockHeight },
+              zIndex: 1,
+            });
+          } else {
+            // Form container varsa, form alanlarını alt alta hizalı ekle
+            const formElements = blocks.filter(block => 
+              block.type !== 'input-form' && isFormElementList.includes(block.type)
+            );
 
-    addBlock({
-      type: item.blockType,
-      content: blockDefinition?.defaultContent || {},
-      style: blockDefinition?.defaultStyle || {},
-      position: { x: centeredX, y: centeredY },
-      size: { width: blockWidth, height: blockHeight },
-      zIndex: 1,
-    });
-  } else {
-    // Form container varsa, form alanlarını alt alta hizalı ekle
-    const formElements = blocks.filter(block => 
-      block.type !== 'input-form' && isFormElementList.includes(block.type)
-    );
+            // Y'ye göre sıralama
+            const sortedFormElements = formElements.sort((a, b) => a.position.y - b.position.y);
+            const lastElement = sortedFormElements[sortedFormElements.length - 1];
 
-    // Y'ye göre sıralama
-    const sortedFormElements = formElements.sort((a, b) => a.position.y - b.position.y);
-    const lastElement = sortedFormElements[sortedFormElements.length - 1];
+            // Yeni form elemanının y konumu: en alt bloğun altı
+            const newY = lastElement
+              ? lastElement.position.y + lastElement.size.height + verticalSpacing
+              : formContainer.position.y + 60;
 
-    // Yeni form elemanının y konumu: en alt bloğun altı
-    const newY = lastElement
-      ? lastElement.position.y + lastElement.size.height + verticalSpacing
-      : formContainer.position.y + 60;
+            const newX = defaultX;
 
-    const newX = formContainer.position.x + 20;
+            // Yeni bir form grubu oluştur veya mevcut gruba ekle
+            let groupId = formContainer.groupId;
+            if (!groupId) {
+              // Form container için yeni bir grup oluştur
+              const { createGroup } = useBuilderStore.getState();
+              groupId = createGroup([formContainer.id]);
+            }
 
-    addBlock({
-      type: item.blockType,
-      content: blockDefinition?.defaultContent || {},
-      style: {
-        ...blockDefinition?.defaultStyle || {},
-        border: '1px solid #e5e7eb',
-        borderRadius: '4px',
-        backgroundColor: '#ffffff',
-        margin: '0 0 10px 0'
-      },
-      position: { x: newX, y: newY },
-      size: { width: blockWidth, height: blockHeight },
-      zIndex: 2,
-    });
+            addBlock({
+              type: item.blockType,
+              content: blockDefinition?.defaultContent || {},
+              style: {
+                ...blockDefinition?.defaultStyle || {},
+                width: `${defaultWidth}px`,
+              },
+              position: { x: newX, y: newY },
+              size: { width: blockWidth, height: blockHeight },
+              zIndex: 2,
+              groupId,
+              isGrouped: true
+            });
 
-    // Form container yüksekliğini güncelle
-    const totalFormElements = formElements.length + 1;
-    const newFormHeight = Math.max(350, 80 + (totalFormElements * (blockHeight + verticalSpacing)) + 20);
-
-    const { updateBlock } = useBuilderStore.getState();
-    updateBlock(formContainer.id, {
-      size: { 
-        width: formContainer.size.width, 
-        height: newFormHeight 
-      }
-    });
-  }
-} else {
+            const totalFormElements = formElements.length + 1;
+            const newFormHeight = Math.max(350, 80 + (totalFormElements * (blockHeight + verticalSpacing)) + 20);
+            const { updateBlock } = useBuilderStore.getState();
+            updateBlock(formContainer.id, {
+              size: {
+                width: formContainer.size.width,
+                height: newFormHeight
+              }
+            });
+          }
+        } else {
           // Normal elementler için mevcut davranış
           const blockWidth = blockDefinition?.defaultSize?.width || 200;
           const blockHeight = blockDefinition?.defaultSize?.height || 100;
@@ -142,18 +151,30 @@ if (isFormElement) {
           });
         }
       } else if (item.type === 'existing') {
-        // Handle moving existing blocks - center the block on mouse cursor
         const { moveBlock } = useBuilderStore.getState();
         const block = blocks.find(b => b.id === item.id);
         if (block) {
           const centeredX = x - (block.size.width / 2);
           const centeredY = y - (block.size.height / 2);
-          moveBlock(item.id, { x: centeredX, y: centeredY });
+          
+          // Bloğun eski ve yeni pozisyonları arasındaki farkı hesapla
+          const deltaX = centeredX - block.position.x;
+          const deltaY = centeredY - block.position.y;
+          
+          // Eğer bu bir grup elemanıysa, tüm grubu taşı
+          if (block.groupId) {
+            const { moveGroup } = useBuilderStore.getState();
+            moveGroup(block.groupId, deltaX, deltaY);
+          } else {
+            // Tek bir bloğu taşı
+            moveBlock(item.id, { x: centeredX, y: centeredY });
+          }
+          
+          // Taşıma bilgisini döndür (grup taşıma için)
+          return { deltaX, deltaY };
         }
       }
-      
-      // Clear any selection when dropping a new block
-      if (item.type === 'new') {
+        if (item.type === 'new') {
         selectBlock(null);
       }
     },

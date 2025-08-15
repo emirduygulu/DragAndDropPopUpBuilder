@@ -30,6 +30,12 @@ interface BuilderStore {
   resizeBlock: (id: string, size: { width: number; height: number }) => void;
   updateBlockStyle: (id: string, style: Partial<BlockStyle>) => void;
   
+  // Grup yönetimi
+  createGroup: (blockIds: string[]) => string;
+  addToGroup: (groupId: string, blockId: string) => void;
+  removeFromGroup: (blockId: string) => void;
+  moveGroup: (groupId: string, offsetX: number, offsetY: number) => void;
+  
   // History actions
   saveHistory: () => void;
   undo: () => void;
@@ -155,6 +161,41 @@ export const useBuilderStore = create<BuilderStore>((set, get) => ({
       ),
     }));
     get().saveHistory();
+  },
+  
+  // Grup yönetimi
+  createGroup: (blockIds) => {
+    const groupId = uuidv4();
+    set((state) => ({
+      blocks: state.blocks.map((block) =>
+        blockIds.includes(block.id) ? { ...block, groupId } : block
+      ),
+    }));
+    return groupId;
+  },
+  
+  addToGroup: (groupId, blockId) => {
+    set((state) => ({
+      blocks: state.blocks.map((block) =>
+        block.id === blockId ? { ...block, groupId } : block
+      ),
+    }));
+  },
+  
+  removeFromGroup: (blockId) => {
+    set((state) => ({
+      blocks: state.blocks.map((block) =>
+        block.id === blockId ? { ...block, groupId: undefined } : block
+      ),
+    }));
+  },
+  
+  moveGroup: (groupId, offsetX, offsetY) => {
+    set((state) => ({
+      blocks: state.blocks.map((block) =>
+        block.groupId === groupId ? { ...block, position: { x: block.position.x + offsetX, y: block.position.y + offsetY } } : block
+      ),
+    }));
   },
   
   // History actions

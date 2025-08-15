@@ -3,6 +3,8 @@ import { GiftBoxProperties } from './Properties/GiftBox';
 import { CountdownProperties } from './Properties/Countdown/CountdownProperties';
 import { ProgressBarProperties } from './Properties/Progress/ProgressBarProperties';
 import { SpinWheelProperties } from './Properties/Spin';
+import { FormElementProperties } from './Properties/Form/FormElementProperties';
+import { FormContainerProperties } from './Properties/Form/FormContainerProperties';
 import { useBuilderStore } from '../../../store/builderStore';
 import { useState, useRef } from 'react';
 
@@ -14,7 +16,10 @@ export const BlockProperties = ({ block }: BlockPropertiesProps) => {
   // Blok tipine göre uygun özellikler panelini göster
   const renderPropertiesPanel = () => {
     switch (block.type) {
-      // Form bileşenleri - Henüz özel property panelleri oluşturulmadı
+      // Form bileşenleri
+      case 'input-form':
+        return <FormContainerProperties block={block} />;
+        
       case 'input-name':
       case 'input-email':
       case 'input-phone':
@@ -26,8 +31,7 @@ export const BlockProperties = ({ block }: BlockPropertiesProps) => {
       case 'checkbox-consent':
       case 'radio-consent':
       case 'submit-button':
-        // Geçici olarak genel özellikler panelini kullan
-        return renderBasicBlockProperties(block);
+        return <FormElementProperties block={block} />;
         
       // Special bileşenleri
       case 'gift-box':

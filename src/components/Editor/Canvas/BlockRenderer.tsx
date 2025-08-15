@@ -44,21 +44,46 @@ interface BlockRendererProps {
 type ResizeHandle = 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | null;
 
 export const BlockRenderer = ({ block, isSelected }: BlockRendererProps) => {
-  const { selectBlock, moveBlock, resizeBlock } = useBuilderStore();
+  const { selectBlock, moveBlock, resizeBlock, moveGroup, blocks } = useBuilderStore();
   const blockRef = useRef<HTMLDivElement>(null);
   const [resizing, setResizing] = useState<ResizeHandle>(null);
   const [startPos, setStartPos] = useState({ x: 0, y: 0 });
   const [startSize, setStartSize] = useState({ width: 0, height: 0 });
   const [startBlockPos, setStartBlockPos] = useState({ x: 0, y: 0 });
   
+  // Form elementleri için grup kontrolü
+  const isFormElement = [
+    'input-name', 'input-email', 'input-phone', 'input-city', 
+    'input-gender', 'input-address', 'input-date', 'dropdown-city',
+    'checkbox-consent', 'radio-consent', 'submit-button'
+  ].includes(block.type);
+  
+  // Form container'ı bul
+  const formContainer = blocks.find(b => b.type === 'input-form');
+  
   // Drag functionality for existing blocks
   const [{ isDragging }, drag] = useDrag({
     type: 'BLOCK_INSTANCE',
-    item: { id: block.id, type: 'existing' },
+    item: { 
+      id: block.id, 
+      type: 'existing',
+      isFormElement,
+      groupId: block.groupId
+    },
     collect: (monitor) => ({
       isDragging: !!monitor.isDragging(),
     }),
     canDrag: () => !resizing,
+    end: (item, monitor) => {
+      // Grup içindeki blokları da taşı
+      if (item.groupId && monitor.didDrop()) {
+        const dropResult = monitor.getDropResult() as any;
+        if (dropResult && dropResult.deltaX !== undefined && dropResult.deltaY !== undefined) {
+          // Grup içindeki diğer blokları da taşı
+          moveGroup(item.groupId, dropResult.deltaX, dropResult.deltaY);
+        }
+      }
+    }
   });
   
   // Make sure the block is selectable and draggable after being placed
@@ -247,19 +272,6 @@ export const BlockRenderer = ({ block, isSelected }: BlockRendererProps) => {
     }
   };
 
-  const isFormElement = block.type === 'input-form' || 
-                         block.type === 'input-name' || 
-                         block.type === 'input-email' || 
-                         block.type === 'input-phone' || 
-                         block.type === 'input-city' || 
-                         block.type === 'input-gender' || 
-                         block.type === 'input-address' || 
-                         block.type === 'input-date' || 
-                         block.type === 'dropdown-city' || 
-                         block.type === 'checkbox-consent' || 
-                         block.type === 'radio-consent' || 
-                         block.type === 'submit-button';
-  
   return (
     <div
       ref={(node) => {

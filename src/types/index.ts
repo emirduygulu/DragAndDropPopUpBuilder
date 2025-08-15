@@ -65,6 +65,9 @@ export interface BlockStyle {
   justifyContent?: string;
   overflow?: string;
   cursor?: string;
+  borderColor?: string;
+  borderWidth?: string;
+  borderStyle?: string;
 }
 
 // Block Animation
@@ -215,6 +218,8 @@ export interface BlockInstance {
   zIndex: number;
   animation?: BlockAnimation;
   actions?: BlockAction[];
+  groupId?: string; // Bloğun ait olduğu grup ID'si
+  isGrouped?: boolean; // Bloğun bir gruba ait olup olmadığı
 }
 
 // Canvas Mode
