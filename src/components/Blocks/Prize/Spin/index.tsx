@@ -19,11 +19,11 @@ export const SpinWheelBlock = ({ block }: SpinWheelBlockProps) => {
   const [isMobile, setIsMobile] = useState(false);
   const [deviceMode, setDeviceMode] = useState<'desktop' | 'mobile'>('desktop');
   
-  // Varsayılan ayarlar
+  // Varsayılan ayarlar - daha küçük boyutlarla
   const settings: SpinWheelSettings = content.settings || {
     layout: {
-      desktop: { width: 500, height: 400, wheelPosition: 'left', wheelSize: 200 },
-      mobile: { width: 360, height: 450, wheelPosition: 'top', wheelSize: 180 }
+      desktop: { width: 300, height: 300, wheelPosition: 'left', wheelSize: 150 },
+      mobile: { width: 260, height: 350, wheelPosition: 'top', wheelSize: 130 }
     },
     colorTheme: {
       container: { backgroundColor: '#ffffff', textColor: '#1f2937' },
@@ -39,14 +39,14 @@ export const SpinWheelBlock = ({ block }: SpinWheelBlockProps) => {
       countdownBar: { backgroundColor: '#8b5cf6', textColor: '#ffffff' }
     },
     texts: {
-      headline: 'Spin for Exclusive Rewards!',
-      description: 'Enter your email and spin the wheel to unlock amazing discounts and prizes. Don\'t wait—your chance to win is just a spin away!',
-      disclaimer: 'By subscribing, you agree to receive marketing emails from us. Unsubscribe anytime. See our Privacy Policy for details.',
+      headline: 'Spin for Rewards!',
+      description: 'Enter your email and spin the wheel to unlock discounts.',
+      disclaimer: 'By subscribing, you agree to receive marketing emails.',
       submitButton: 'Spin Now',
-      closeLink: 'No, I don\'t feel lucky',
+      closeLink: 'No thanks',
       winningHeadline: 'Congratulations! You won:',
       losingHeadline: 'Better luck next time!',
-      winningMessage: 'You\'ve unlocked an amazing reward!',
+      winningMessage: 'You\'ve unlocked a reward!',
       losingMessage: 'Don\'t worry, you can try again!'
     },
     formFields: [
@@ -118,7 +118,7 @@ export const SpinWheelBlock = ({ block }: SpinWheelBlockProps) => {
     
     const centerX = canvas.width / 2;
     const centerY = canvas.height / 2;
-    const radius = Math.min(centerX, centerY) - 15;
+    const radius = Math.min(centerX, centerY) - 10; // Biraz daha küçük radius
     
     // Canvas'ı temizle
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -152,7 +152,7 @@ export const SpinWheelBlock = ({ block }: SpinWheelBlockProps) => {
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillStyle = slice.color;
-      ctx.font = 'bold 16px Arial, sans-serif';
+      ctx.font = 'bold 14px Arial, sans-serif'; // Daha küçük font
       
       // Metni dilim içinde konumlandır
       const textRadius = radius * 0.6;
@@ -282,8 +282,6 @@ export const SpinWheelBlock = ({ block }: SpinWheelBlockProps) => {
         ...style
       }}
     >
-
-      
       {/* Close Button */}
       <button className={styles.closeButton}>
         <span>×</span>

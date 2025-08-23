@@ -63,6 +63,13 @@ export interface BlockStyle {
   display?: string;
   gap?: string;
   justifyContent?: string;
+  alignItems?: string;
+  flexDirection?: string;
+  flexWrap?: string;
+  flexGrow?: string;
+  flexShrink?: string;
+  flexBasis?: string;
+  alignSelf?: string;
   overflow?: string;
   cursor?: string;
   borderColor?: string;
@@ -231,6 +238,11 @@ export interface CanvasSettings {
   width: number;
   height: number;
   background: string;
+  name?: string;
+  font?: string;
+  cornerRadius?: number;
+  shadow?: string;
+  border?: string;
   overlay?: {
     color: string;
     opacity: number;

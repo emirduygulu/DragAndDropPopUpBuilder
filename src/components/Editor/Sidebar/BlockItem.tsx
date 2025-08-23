@@ -39,9 +39,9 @@ export const BlockItem = ({ block }: BlockItemProps) => {
       className={`block-item ${isDragging ? 'opacity-50' : ''}`}
       title={block.description}
     >
-      <div className="flex flex-col items-center justify-center w-full p-2 gap-1">
-        <IconComponent className="block-item-icon" size={20} />
-        <span className="text-xs font-medium text-center">{block.name}</span>
+      <div className="flex flex-col items-center justify-center w-full p-1.5 gap-0.5">
+        <IconComponent className="block-item-icon" size={16} />
+        <span className="text-xs font-medium text-center truncate w-full">{block.name}</span>
       </div>
     </div>
   );

@@ -7,15 +7,56 @@ import { blockCategories } from '../../../utils/blockDefinitions';
 
 interface CanvasProps {
   className?: string;
+  scale?: number;
 }
 
-const Canvas = ({ className = '' }: CanvasProps) => {
+const Canvas = ({ className = '', scale = 0.8 }: CanvasProps) => {
   const { blocks, canvasSettings, addBlock, selectBlock, selectedBlockId, setCanvasSettings } = useBuilderStore();
   const [isDraggingOver, setIsDraggingOver] = useState(false);
   const [showCrosshair, setShowCrosshair] = useState(true);
   const [showGrid, setShowGrid] = useState(true);
   const canvasRef = useRef<HTMLDivElement>(null);
   
+  // Calculate position style based on position value
+  // const getPositionStyle = () => {
+  //   const position = canvasSettings.position || 'center';
+  //   let positionStyle = {};
+  //   
+  //   switch (position) {
+  //     case 'top-left':
+  //       positionStyle = { top: 0, left: 0 };
+  //       break;
+  //     case 'top':
+  //       positionStyle = { top: 0, left: '50%', transform: 'translateX(-50%)' };
+  //       break;
+  //     case 'top-right':
+  //       positionStyle = { top: 0, right: 0 };
+  //       break;
+  //     case 'left':
+  //       positionStyle = { top: '50%', left: 0, transform: 'translateY(-50%)' };
+  //       break;
+  //     case 'center':
+  //       positionStyle = { top: '50%', left: '50%', transform: 'translate(-50%, -50%)' };
+  //       break;
+  //     case 'right':
+  //       positionStyle = { top: '50%', right: 0, transform: 'translateY(-50%)' };
+  //       break;
+  //     case 'bottom-left':
+  //       positionStyle = { bottom: 0, left: 0 };
+  //       break;
+  //     case 'bottom':
+  //       positionStyle = { bottom: 0, left: '50%', transform: 'translateX(-50%)' };
+  //       break;
+  //     case 'bottom-right':
+  //       positionStyle = { bottom: 0, right: 0 };
+  //       break;
+  //     default:
+  //       positionStyle = {};
+  //   }
+  //   
+  //   return positionStyle;
+  // };
+
   // Handle drop of new blocks onto the canvas
   const [{ isOver }, drop] = useDrop({
     accept: ['BLOCK_TYPE', 'BLOCK_INSTANCE'],
@@ -28,9 +69,9 @@ const Canvas = ({ className = '' }: CanvasProps) => {
       
       if (!dropPosition) return;
       
-      // Calculate position relative to the canvas
-      const x = dropPosition.x - canvasRect.left;
-      const y = dropPosition.y - canvasRect.top;
+      // Calculate position relative to the canvas, accounting for scale
+      const x = (dropPosition.x - canvasRect.left) / scale;
+      const y = (dropPosition.y - canvasRect.top) / scale;
       
       if (item.type === 'new') {
         // Find the block definition to get default size and content
@@ -214,72 +255,86 @@ const Canvas = ({ className = '' }: CanvasProps) => {
           </button>
         </div>
         
-        <div
-          ref={canvasRef}
-          className={`canvas relative ${className} ${isDraggingOver ? 'bg-gray-100' : ''}`}
+        <div 
+          className="canvas-wrapper mx-auto"
           style={{
-            width: canvasSettings.width,
-            height: canvasSettings.height,
-            backgroundColor: canvasSettings.background,
-            transition: 'background-color 0.2s ease-in-out',
-            backgroundImage: showGrid ? `
-              linear-gradient(rgba(0,0,0,0.1) 1px, transparent 1px),
-              linear-gradient(90deg, rgba(0,0,0,0.1) 1px, transparent 1px)
-            ` : 'none',
-            backgroundSize: '20px 20px',
-            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+            transform: `scale(${scale})`,
+            transformOrigin: 'top left',
+            width: canvasSettings.width * scale,
+            height: canvasSettings.height * scale,
+            position: 'relative',
           }}
-          onClick={() => selectBlock(null)}
         >
-          {/* Crosshair Lines */}
-          {showCrosshair && (
-            <>
-              {/* Vertical Center Line */}
-              <div 
-                className="absolute top-0 w-px h-full pointer-events-none z-10"
-                style={{ 
-                  left: '50%',
-                  backgroundColor: 'rgba(239, 68, 68, 0.8)',
-                  transform: 'translateX(-50%)'
-                }}
-              />
-              {/* Horizontal Center Line */}
-              <div 
-                className="absolute left-0 w-full h-px pointer-events-none z-10"
-                style={{ 
-                  top: '50%',
-                  backgroundColor: 'rgba(239, 68, 68, 0.8)',
-                  transform: 'translateY(-50%)'
-                }}
-              />
-              {/* Center Point */}
-              <div 
-                className="absolute w-2 h-2 bg-red-500 rounded-full pointer-events-none z-11"
-                style={{ 
-                  top: '50%',
-                  left: '50%',
-                  transform: 'translate(-50%, -50%)'
-                }}
-              />
-            </>
-          )}
-          
-          {blocks.length === 0 && (
-            <div className="absolute inset-0 flex items-center justify-center text-gray-400">
-              <div className="text-center bg-blue-50 border-2 border-dashed border-blue-200 rounded-lg p-8 m-4">
-                <p className="text-lg font-medium text-blue-600">Drag and drop blocks here</p>
-                <p className="text-sm text-blue-500 mt-2">or click a block in the sidebar</p>
+          <div
+            ref={canvasRef}
+            className={`canvas relative ${className} ${isDraggingOver ? 'bg-gray-100' : ''}`}
+            style={{
+              width: canvasSettings.width,
+              height: canvasSettings.height,
+              backgroundColor: canvasSettings.background,
+              transition: 'background-color 0.2s ease-in-out',
+              backgroundImage: showGrid ? `
+                linear-gradient(rgba(0,0,0,0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,0,0,0.1) 1px, transparent 1px)
+              ` : 'none',
+              backgroundSize: '20px 20px',
+              boxShadow: canvasSettings.shadow || '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+              borderRadius: canvasSettings.cornerRadius ? `${canvasSettings.cornerRadius}px` : '0',
+              border: canvasSettings.border || 'none',
+            }}
+            onClick={() => selectBlock(null)}
+          >
+            {/* Crosshair Lines */}
+            {showCrosshair && (
+              <>
+                {/* Vertical Center Line */}
+                <div 
+                  className="absolute top-0 w-px h-full pointer-events-none z-10"
+                  style={{ 
+                    left: '50%',
+                    backgroundColor: 'rgba(239, 68, 68, 0.8)',
+                    transform: 'translateX(-50%)'
+                  }}
+                />
+                {/* Horizontal Center Line */}
+                <div 
+                  className="absolute left-0 w-full h-px pointer-events-none z-10"
+                  style={{ 
+                    top: '50%',
+                    backgroundColor: 'rgba(239, 68, 68, 0.8)',
+                    transform: 'translateY(-50%)'
+                  }}
+                />
+                {/* Center Point */}
+                <div 
+                  className="absolute w-2 h-2 bg-red-500 rounded-full pointer-events-none z-11"
+                  style={{ 
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)'
+                  }}
+                />
+              </>
+            )}
+            
+            {blocks.length === 0 && (
+              <div className="absolute inset-0 flex items-center justify-center text-gray-400">
+                <div className="text-center bg-blue-50 border-2 border-dashed border-blue-200 rounded-lg p-8 m-4">
+                  <p className="text-lg font-medium text-blue-600">Drag and drop blocks here</p>
+                  <p className="text-sm text-blue-500 mt-2">or click a block in the sidebar</p>
+                </div>
               </div>
-            </div>
-          )}
-          
-          {blocks.map((block) => (
-            <BlockRenderer
-              key={block.id}
-              block={block}
-              isSelected={block.id === selectedBlockId}
-            />
-          ))}
+            )}
+            
+            {blocks.map((block) => (
+              <BlockRenderer
+                key={block.id}
+                block={block}
+                isSelected={block.id === selectedBlockId}
+                scale={scale}
+              />
+            ))}
+          </div>
         </div>
       </div>
     </div>

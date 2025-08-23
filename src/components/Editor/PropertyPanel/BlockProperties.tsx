@@ -1,25 +1,111 @@
+import { useState, useEffect } from 'react';
+import { useBuilderStore } from '../../../store/builderStore';
 import type { BlockInstance } from '../../../types';
-import { GiftBoxProperties } from './Properties/GiftBox';
 import { CountdownProperties } from './Properties/Countdown/CountdownProperties';
+import { FormContainerProperties } from './Properties/Form/FormContainerProperties';
+import { FormElementProperties } from './Properties/Form/FormElementProperties';
 import { ProgressBarProperties } from './Properties/Progress/ProgressBarProperties';
 import { SpinWheelProperties } from './Properties/Spin';
-import { FormElementProperties } from './Properties/Form/FormElementProperties';
-import { FormContainerProperties } from './Properties/Form/FormContainerProperties';
-import { useBuilderStore } from '../../../store/builderStore';
-import { useState, useRef } from 'react';
+import { GiftBoxProperties } from './Properties/GiftBox';
 
 interface BlockPropertiesProps {
   block: BlockInstance;
 }
 
 export const BlockProperties = ({ block }: BlockPropertiesProps) => {
-  // Blok tipine göre uygun özellikler panelini göster
-  const renderPropertiesPanel = () => {
+  const { updateBlock, removeBlock } = useBuilderStore();
+  const [content, setContent] = useState(block.content);
+  const [style, setStyle] = useState(block.style);
+  const [position, setPosition] = useState(block.position);
+  const [size, setSize] = useState(block.size);
+  
+  // Update local state when block changes
+  useEffect(() => {
+    setContent(block.content);
+    setStyle(block.style);
+    setPosition(block.position);
+    setSize(block.size);
+  }, [block]);
+  
+  // Update block in store when local state changes
+  const updateBlockProperty = (property: string, value: any) => {
+    updateBlock(block.id, { [property]: value });
+  };
+  
+  // Handle text content change
+  const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const newContent = { ...content, text: e.target.value };
+    setContent(newContent);
+    updateBlockProperty('content', newContent);
+  };
+  
+  // Handle heading content change
+  const handleHeadingChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newContent = { ...content, text: e.target.value };
+    setContent(newContent);
+    updateBlockProperty('content', newContent);
+  };
+  
+  // Handle button text change
+  const handleButtonTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newContent = { ...content, text: e.target.value };
+    setContent(newContent);
+    updateBlockProperty('content', newContent);
+  };
+  
+  // Handle image URL change
+  const handleImageUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newContent = { ...content, url: e.target.value };
+    setContent(newContent);
+    updateBlockProperty('content', newContent);
+  };
+  
+  // Handle HTML content change
+  const handleHTMLChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const newContent = { ...content, html: e.target.value };
+    setContent(newContent);
+    updateBlockProperty('content', newContent);
+  };
+  
+  // Handle position change
+  const handlePositionChange = (axis: 'x' | 'y', value: string) => {
+    const numValue = parseInt(value, 10);
+    if (!isNaN(numValue)) {
+      const newPosition = { ...position, [axis]: numValue };
+      setPosition(newPosition);
+      updateBlockProperty('position', newPosition);
+    }
+  };
+  
+  // Handle size change
+  const handleSizeChange = (dimension: 'width' | 'height', value: string) => {
+    const numValue = parseInt(value, 10);
+    if (!isNaN(numValue)) {
+      const newSize = { ...size, [dimension]: numValue };
+      setSize(newSize);
+      updateBlockProperty('size', newSize);
+    }
+  };
+  
+  // Handle style change
+  const handleStyleChange = (property: string, value: string) => {
+    const newStyle = { ...style, [property]: value };
+    setStyle(newStyle);
+    updateBlockProperty('style', newStyle);
+  };
+  
+  // Handle block deletion
+  const handleDeleteBlock = () => {
+    removeBlock(block.id);
+  };
+  
+  // Render specific properties based on block type
+  const renderSpecificProperties = () => {
     switch (block.type) {
-      // Form bileşenleri
+      case 'countdown-timer':
+        return <CountdownProperties block={block} />;
       case 'input-form':
         return <FormContainerProperties block={block} />;
-        
       case 'input-name':
       case 'input-email':
       case 'input-phone':
@@ -32,498 +118,617 @@ export const BlockProperties = ({ block }: BlockPropertiesProps) => {
       case 'radio-consent':
       case 'submit-button':
         return <FormElementProperties block={block} />;
-        
-      // Special bileşenleri
-      case 'gift-box':
-        return <GiftBoxProperties block={block} />;
-      case 'countdown-timer':
-        return <CountdownProperties block={block} />;
       case 'progress-bar':
         return <ProgressBarProperties block={block} />;
-      case 'social-icons':
-      case 'video':
-        // Geçici olarak genel özellikler panelini kullan
-        return renderBasicBlockProperties(block);
       case 'spin-wheel':
         return <SpinWheelProperties block={block} />;
-        
-      // Basic bileşenler - Genel özellikler paneli
-      case 'text':
-      case 'image':
-      case 'button':
-      case 'divider':
-      case 'spacer':
-      case 'geometric':
-      case 'html':
-      case 'heading':
-      case 'close-button':
-        return renderBasicBlockProperties(block);
-        
-      // Diğer bileşenler için paneller eklenecek
+      case 'gift-box':
+        return <GiftBoxProperties block={block} />;
       default:
-        // Varsayılan özellikler paneli
-        return (
-          <div className="p-4">
-            <p className="text-gray-500">Bu blok tipi için özellikler henüz eklenmedi.</p>
-            <p className="text-sm text-gray-400 mt-2">Blok Tipi: {block.type}</p>
-          </div>
-        );
+        return null;
     }
   };
   
-  // Basic bileşenler için genel özellikler paneli
-  const renderBasicBlockProperties = (block: BlockInstance) => {
-    const { updateBlockContent, updateBlockStyle, removeBlock, resizeBlock, moveBlock } = useBuilderStore();
-    const fileInputRef = useRef<HTMLInputElement>(null);
-    const [uploadingImage, setUploadingImage] = useState(false);
-    
-    const handleStyleChange = (key: string, value: string) => {
-      updateBlockStyle(block.id, { [key]: value });
-    };
-    
-    const handleContentChange = (key: string, value: any) => {
-      updateBlockContent(block.id, {
-        ...block.content,
-        [key]: value
-      });
-    };
-    
-    const handleSizeChange = (dimension: 'width' | 'height', value: string) => {
-      const numValue = parseInt(value, 10);
-      if (!isNaN(numValue) && numValue > 0) {
-        resizeBlock(block.id, { 
-          ...block.size, 
-          [dimension]: numValue 
-        });
-      }
-    };
-    
-    const handlePositionChange = (axis: 'x' | 'y', value: string) => {
-      const numValue = parseInt(value, 10);
-      if (!isNaN(numValue) && numValue >= 0) {
-        moveBlock(block.id, { 
-          ...block.position, 
-          [axis]: numValue 
-        });
-      }
-    };
-    
-    const handleDeleteBlock = () => {
-      removeBlock(block.id);
-    };
-    
-    const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-      const file = e.target.files?.[0];
-      if (!file) return;
-      
-      setUploadingImage(true);
-      
-      // FileReader kullanarak dosyayı base64'e çeviriyoruz
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        // Base64 formatındaki görsel verisini src olarak ayarlıyoruz
-        if (typeof reader.result === 'string') {
-          handleContentChange('src', reader.result);
-          setUploadingImage(false);
-        }
-      };
-      
-      reader.onerror = () => {
-        console.error('Görsel yükleme hatası');
-        setUploadingImage(false);
-      };
-      
-      reader.readAsDataURL(file);
-    };
-    
-    const triggerFileInput = () => {
-      fileInputRef.current?.click();
-    };
-    
-    return (
-      <div className="p-4 space-y-6">
-        {/* Silme butonu */}
-        <div>
-          <button
-            onClick={handleDeleteBlock}
-            className="w-full py-2 bg-red-500 text-white font-medium rounded hover:bg-red-600 focus:outline-none"
-          >
-            Bloğu Sil
-          </button>
-        </div>
-        
-        {/* Blok tipi başlığı */}
-        <div>
-          <h3 className="font-medium mb-4">
-            {block.type === 'text' && 'Metin Bloğu'}
-            {block.type === 'image' && 'Görsel Bloğu'}
-            {block.type === 'button' && 'Buton Bloğu'}
-            {block.type === 'divider' && 'Ayırıcı Bloğu'}
-            {block.type === 'spacer' && 'Boşluk Bloğu'}
-            {block.type === 'geometric' && 'Geometrik Şekil Bloğu'}
-            {block.type === 'html' && 'HTML Bloğu'}
-            {block.type === 'heading' && 'Başlık Bloğu'}
-            {block.type === 'close-button' && 'Kapat Butonu Bloğu'}
-          </h3>
-        </div>
-        
-        {/* İçerik ayarları - blok tipine göre değişir */}
-        {(block.type === 'text' || block.type === 'heading') && (
-          <div>
-            <h4 className="font-medium mb-2">İçerik</h4>
-            <textarea
-              className="w-full p-2 border rounded"
-              rows={3}
-              value={block.content.text || ''}
-              onChange={(e) => handleContentChange('text', e.target.value)}
-            />
-          </div>
-        )}
-        
-        {block.type === 'image' && (
-          <div>
-            {/* Görsel Yükleme */}
-            <div className="mb-4">
-              <h4 className="font-medium mb-2">Görsel Yükle</h4>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                onChange={handleImageUpload}
-                className="hidden"
-              />
-              <button
-                onClick={triggerFileInput}
-                className="w-full py-2 bg-blue-500 text-white font-medium rounded hover:bg-blue-600 focus:outline-none"
-                disabled={uploadingImage}
-              >
-                {uploadingImage ? 'Yükleniyor...' : 'Görsel Seç'}
-              </button>
-            </div>
-            
-            {/* Görsel Önizleme */}
-            {block.content.src && (
-              <div className="mb-4">
-                <h4 className="font-medium mb-2">Önizleme</h4>
-                <div className="border rounded p-2 flex justify-center">
-                  <img 
-                    src={block.content.src} 
-                    alt={block.content.alt || ''} 
-                    className="max-h-40 object-contain"
-                  />
-                </div>
-              </div>
-            )}
-            
-            {/* Görsel URL (Alternatif olarak manuel giriş) */}
-            <div className="mb-4">
-              <h4 className="font-medium mb-2">Görsel URL (Opsiyonel)</h4>
-              <input
-                type="text"
-                className="w-full p-2 border rounded mb-2"
-                value={block.content.src || ''}
-                onChange={(e) => handleContentChange('src', e.target.value)}
-                placeholder="https://example.com/image.jpg"
-              />
-              <p className="text-xs text-gray-500">
-                Görsel yüklenemediğinde veya ekran okuyucular için görüntülenir.
-              </p>
-            </div>
-            
-            {/* Alternatif Metin */}
-            <div>
-              <h4 className="font-medium mb-2">Alternatif Metin</h4>
-              <input
-                type="text"
-                className="w-full p-2 border rounded"
-                value={block.content.alt || ''}
-                onChange={(e) => handleContentChange('alt', e.target.value)}
-                placeholder="Görsel açıklaması"
-              />
-              <p className="text-xs text-gray-500 mt-1">
-                Görsel yüklenemediğinde veya ekran okuyucular için görüntülenir.
-              </p>
-            </div>
-          </div>
-        )}
-        
-        {block.type === 'button' && (
-          <div className="space-y-3">
-            <div>
-              <h4 className="font-medium mb-2">Buton Metni</h4>
-              <input
-                type="text"
-                className="w-full p-2 border rounded"
-                value={block.content.text || 'Buton'}
-                onChange={(e) => handleContentChange('text', e.target.value)}
-              />
-            </div>
-            <div>
-              <h4 className="font-medium mb-2">Link URL</h4>
-              <input
-                type="text"
-                className="w-full p-2 border rounded"
-                value={block.content.url || '#'}
-                onChange={(e) => handleContentChange('url', e.target.value)}
-                placeholder="https://example.com"
-              />
-            </div>
-          </div>
-        )}
-        
-        {block.type === 'html' && (
-          <div>
-            <h4 className="font-medium mb-2">HTML Kodu</h4>
-            <textarea
-              className="w-full p-2 border rounded font-mono text-sm"
-              rows={6}
-              value={block.content.html || ''}
-              onChange={(e) => handleContentChange('html', e.target.value)}
-            />
-          </div>
-        )}
-        
-        <div>
-          <h3 className="font-medium mb-4">Konum ve Boyut Ayarları</h3>
-          
-          <div className="grid grid-cols-2 gap-4">
-            {/* X Konumu */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                X Konumu (px)
-              </label>
-              <input
-                type="number"
-                className="input w-full"
-                min="0"
-                value={block.position.x}
-                onChange={(e) => handlePositionChange('x', e.target.value)}
-              />
-            </div>
-            
-            {/* Y Konumu */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Y Konumu (px)
-              </label>
-              <input
-                type="number"
-                className="input w-full"
-                min="0"
-                value={block.position.y}
-                onChange={(e) => handlePositionChange('y', e.target.value)}
-              />
-            </div>
-            
-            {/* Genişlik */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Genişlik (px)
-              </label>
-              <input
-                type="number"
-                className="input w-full"
-                min="10"
-                value={block.size.width}
-                onChange={(e) => handleSizeChange('width', e.target.value)}
-              />
-            </div>
-            
-            {/* Yükseklik */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Yükseklik (px)
-              </label>
-              <input
-                type="number"
-                className="input w-full"
-                min="10"
-                value={block.size.height}
-                onChange={(e) => handleSizeChange('height', e.target.value)}
-              />
-            </div>
-          </div>
-        </div>
-        
-        <div>
-          <h3 className="font-medium mb-4">Stil Ayarları</h3>
-          
-          <div className="space-y-4">
-            {/* Metin Rengi */}
-            {(block.type === 'text' || block.type === 'button' || block.type === 'heading') && (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Metin Rengi
-                </label>
-                <div className="flex">
-                  <input
-                    type="text"
-                    className="input flex-grow"
-                    value={block.style.color || '#000000'}
-                    onChange={(e) => handleStyleChange('color', e.target.value)}
-                  />
-                  <div className="w-10 h-10 border border-gray-300 overflow-hidden ml-2">
-                    <input
-                      type="color"
-                      className="w-12 h-12 -m-1 cursor-pointer"
-                      value={block.style.color || '#000000'}
-                      onChange={(e) => handleStyleChange('color', e.target.value)}
-                    />
-                  </div>
-                </div>
-              </div>
-            )}
-            
-            {/* Arkaplan Rengi */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Arkaplan Rengi
-              </label>
-              <div className="flex">
-                <input
-                  type="text"
-                  className="input flex-grow"
-                  value={block.style.backgroundColor || 'transparent'}
-                  onChange={(e) => handleStyleChange('backgroundColor', e.target.value)}
-                />
-                <div className="w-10 h-10 border border-gray-300 overflow-hidden ml-2">
-                  <input
-                    type="color"
-                    className="w-12 h-12 -m-1 cursor-pointer"
-                    value={block.style.backgroundColor || '#ffffff'}
-                    onChange={(e) => handleStyleChange('backgroundColor', e.target.value)}
-                  />
-                </div>
-              </div>
-            </div>
-            
-            {/* Font Boyutu */}
-            {(block.type === 'text' || block.type === 'button' || block.type === 'heading') && (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Font Boyutu
-                </label>
-                <select
-                  className="input w-full"
-                  value={block.style.fontSize || '16px'}
-                  onChange={(e) => handleStyleChange('fontSize', e.target.value)}
-                >
-                  <option value="12px">12px</option>
-                  <option value="14px">14px</option>
-                  <option value="16px">16px</option>
-                  <option value="18px">18px</option>
-                  <option value="20px">20px</option>
-                  <option value="24px">24px</option>
-                  <option value="28px">28px</option>
-                  <option value="32px">32px</option>
-                  <option value="36px">36px</option>
-                  <option value="48px">48px</option>
-                </select>
-              </div>
-            )}
-            
-            {/* Font Ailesi */}
-            {(block.type === 'text' || block.type === 'button' || block.type === 'heading') && (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Font Ailesi
-                </label>
-                <select
-                  className="input w-full"
-                  value={block.style.fontFamily || 'sans-serif'}
-                  onChange={(e) => handleStyleChange('fontFamily', e.target.value)}
-                >
-                  <option value="sans-serif">Sans-serif</option>
-                  <option value="serif">Serif</option>
-                  <option value="monospace">Monospace</option>
-                  <option value="cursive">Cursive</option>
-                  <option value="fantasy">Fantasy</option>
-                </select>
-              </div>
-            )}
-            
-            {/* Font Ağırlığı */}
-            {(block.type === 'text' || block.type === 'button' || block.type === 'heading') && (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Font Ağırlığı
-                </label>
-                <select
-                  className="input w-full"
-                  value={block.style.fontWeight || 'normal'}
-                  onChange={(e) => handleStyleChange('fontWeight', e.target.value)}
-                >
-                  <option value="normal">Normal</option>
-                  <option value="bold">Kalın</option>
-                  <option value="lighter">İnce</option>
-                  <option value="bolder">Daha Kalın</option>
-                  <option value="100">100</option>
-                  <option value="200">200</option>
-                  <option value="300">300</option>
-                  <option value="400">400</option>
-                  <option value="500">500</option>
-                  <option value="600">600</option>
-                  <option value="700">700</option>
-                  <option value="800">800</option>
-                  <option value="900">900</option>
-                </select>
-              </div>
-            )}
-            
-            {/* Kenar Yuvarlaklığı */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Kenar Yuvarlaklığı
-              </label>
-              <select
-                className="input w-full"
-                value={block.style.borderRadius || '0'}
-                onChange={(e) => handleStyleChange('borderRadius', e.target.value)}
-              >
-                <option value="0">Köşeli</option>
-                <option value="4px">Hafif Yuvarlak (4px)</option>
-                <option value="8px">Yuvarlak (8px)</option>
-                <option value="16px">Çok Yuvarlak (16px)</option>
-                <option value="24px">Tam Yuvarlak (24px)</option>
-                <option value="50%">Daire</option>
-              </select>
-            </div>
-            
-            {/* Kenarlık */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Kenarlık
-              </label>
-              <input
-                type="text"
-                className="input w-full"
-                value={block.style.border || 'none'}
-                onChange={(e) => handleStyleChange('border', e.target.value)}
-                placeholder="1px solid #000000"
-              />
-            </div>
-            
-            {/* Özel CSS */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Özel CSS
-              </label>
-              <textarea
-                className="input w-full"
-                rows={5}
-                placeholder="Örnek: box-shadow: 0 2px 4px rgba(0,0,0,0.1);"
-                value={block.content.customCSS || ''}
-                onChange={(e) => handleContentChange('customCSS', e.target.value)}
-              />
-              <p className="text-xs text-gray-500 mt-1">
-                CSS özelliklerini yazın. Örnek: box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-              </p>
-            </div>
-          </div>
+  return (
+    <div className="block-properties">
+      <div className="mb-3">
+        <h3 className="text-sm font-medium mb-2">Blok Türü</h3>
+        <div className="text-xs bg-gray-100 rounded-md py-1 px-2 inline-block">
+          {block.type}
         </div>
       </div>
-    );
-  };
-  
-  return renderPropertiesPanel();
+      
+      {/* Content Properties */}
+      {block.type === 'text' && (
+        <div className="mb-3">
+          <h3 className="text-sm font-medium mb-2">İçerik</h3>
+          <textarea
+            value={content.text || ''}
+            onChange={handleTextChange}
+            className="w-full h-24 border border-gray-300 rounded-md p-2 text-xs"
+            placeholder="Metin içeriği..."
+          />
+        </div>
+      )}
+      
+      {block.type === 'heading' && (
+        <div className="mb-3">
+          <h3 className="text-sm font-medium mb-2">Başlık</h3>
+          <input
+            type="text"
+            value={content.text || ''}
+            onChange={handleHeadingChange}
+            className="w-full border border-gray-300 rounded-md p-2 text-xs"
+            placeholder="Başlık metni..."
+          />
+        </div>
+      )}
+      
+      {block.type === 'button' && (
+        <div className="mb-3">
+          <h3 className="text-sm font-medium mb-2">Buton Metni</h3>
+          <input
+            type="text"
+            value={content.text || ''}
+            onChange={handleButtonTextChange}
+            className="w-full border border-gray-300 rounded-md p-2 text-xs"
+            placeholder="Buton metni..."
+          />
+        </div>
+      )}
+      
+      {block.type === 'image' && (
+        <div className="mb-3">
+          <h3 className="text-sm font-medium mb-2">Resim URL</h3>
+          <input
+            type="text"
+            value={content.url || ''}
+            onChange={handleImageUrlChange}
+            className="w-full border border-gray-300 rounded-md p-2 text-xs"
+            placeholder="https://example.com/image.jpg"
+          />
+        </div>
+      )}
+      
+      {block.type === 'html' && (
+        <div className="mb-3">
+          <h3 className="text-sm font-medium mb-2">HTML İçeriği</h3>
+          <textarea
+            value={content.html || ''}
+            onChange={handleHTMLChange}
+            className="w-full h-24 border border-gray-300 rounded-md p-2 text-xs font-mono"
+            placeholder="<div>HTML içeriği...</div>"
+          />
+        </div>
+      )}
+      
+      {/* Position and Size */}
+      <div className="mb-3">
+        <h3 className="text-sm font-medium mb-2">Konum ve Boyut Ayarları</h3>
+        
+        <div className="grid grid-cols-2 gap-2 mb-2">
+          <div>
+            <label className="block text-xs text-gray-600 mb-1">X Konumu (px)</label>
+            <input
+              type="number"
+              value={position.x}
+              onChange={(e) => handlePositionChange('x', e.target.value)}
+              className="w-full border border-gray-300 rounded-md p-1.5 text-xs"
+            />
+          </div>
+          <div>
+            <label className="block text-xs text-gray-600 mb-1">Y Konumu (px)</label>
+            <input
+              type="number"
+              value={position.y}
+              onChange={(e) => handlePositionChange('y', e.target.value)}
+              className="w-full border border-gray-300 rounded-md p-1.5 text-xs"
+            />
+          </div>
+        </div>
+        
+        <div className="grid grid-cols-2 gap-2">
+          <div>
+            <label className="block text-xs text-gray-600 mb-1">Genişlik (px)</label>
+            <input
+              type="number"
+              value={size.width}
+              onChange={(e) => handleSizeChange('width', e.target.value)}
+              className="w-full border border-gray-300 rounded-md p-1.5 text-xs"
+            />
+          </div>
+          <div>
+            <label className="block text-xs text-gray-600 mb-1">Yükseklik (px)</label>
+            <input
+              type="number"
+              value={size.height}
+              onChange={(e) => handleSizeChange('height', e.target.value)}
+              className="w-full border border-gray-300 rounded-md p-1.5 text-xs"
+            />
+          </div>
+        </div>
+
+        {/* Responsive Positioning */}
+        <div className="mt-3">
+          <h4 className="text-xs font-medium mb-2">Duyarlı Konumlandırma</h4>
+          
+          <div className="mb-2">
+            <label className="block text-xs text-gray-600 mb-1">Yatay Hizalama</label>
+            <select
+              value={style.alignSelf || 'auto'}
+              onChange={(e) => handleStyleChange('alignSelf', e.target.value)}
+              className="w-full border border-gray-300 rounded-md p-1.5 text-xs"
+            >
+              <option value="auto">Otomatik</option>
+              <option value="flex-start">Sol</option>
+              <option value="center">Orta</option>
+              <option value="flex-end">Sağ</option>
+              <option value="stretch">Genişlet</option>
+            </select>
+          </div>
+          
+          <div className="mb-2">
+            <label className="block text-xs text-gray-600 mb-1">Genişlik Tipi</label>
+            <select
+              value={style.width?.includes('%') ? 'percentage' : 'fixed'}
+              onChange={(e) => {
+                const widthType = e.target.value;
+                if (widthType === 'percentage') {
+                  handleStyleChange('width', '100%');
+                } else {
+                  handleStyleChange('width', `${size.width}px`);
+                }
+              }}
+              className="w-full border border-gray-300 rounded-md p-1.5 text-xs"
+            >
+              <option value="fixed">Sabit (px)</option>
+              <option value="percentage">Yüzde (%)</option>
+            </select>
+          </div>
+          
+          {style.width?.includes('%') && (
+            <div className="mb-2">
+              <label className="block text-xs text-gray-600 mb-1">Genişlik (%)</label>
+              <input
+                type="number"
+                min="1"
+                max="100"
+                value={parseInt(style.width || '100', 10)}
+                onChange={(e) => handleStyleChange('width', `${e.target.value}%`)}
+                className="w-full border border-gray-300 rounded-md p-1.5 text-xs"
+              />
+            </div>
+          )}
+          
+          <div className="mb-2">
+            <label className="block text-xs text-gray-600 mb-1">Yükseklik Tipi</label>
+            <select
+              value={style.height?.includes('%') ? 'percentage' : 'fixed'}
+              onChange={(e) => {
+                const heightType = e.target.value;
+                if (heightType === 'percentage') {
+                  handleStyleChange('height', '100%');
+                } else {
+                  handleStyleChange('height', `${size.height}px`);
+                }
+              }}
+              className="w-full border border-gray-300 rounded-md p-1.5 text-xs"
+            >
+              <option value="fixed">Sabit (px)</option>
+              <option value="percentage">Yüzde (%)</option>
+            </select>
+          </div>
+          
+          {style.height?.includes('%') && (
+            <div className="mb-2">
+              <label className="block text-xs text-gray-600 mb-1">Yükseklik (%)</label>
+              <input
+                type="number"
+                min="1"
+                max="100"
+                value={parseInt(style.height || '100', 10)}
+                onChange={(e) => handleStyleChange('height', `${e.target.value}%`)}
+                className="w-full border border-gray-300 rounded-md p-1.5 text-xs"
+              />
+            </div>
+          )}
+        </div>
+      </div>
+      
+      {/* Style Properties */}
+      <div className="mb-3">
+        <h3 className="text-sm font-medium mb-2">Stil Ayarları</h3>
+        
+        {/* Background Color */}
+        <div className="mb-2">
+          <label className="block text-xs text-gray-600 mb-1">Arkaplan Rengi</label>
+          <div className="flex items-center">
+            <input
+              type="color"
+              value={style.backgroundColor || '#ffffff'}
+              onChange={(e) => handleStyleChange('backgroundColor', e.target.value)}
+              className="w-8 h-8 border border-gray-300 rounded-md mr-2"
+            />
+            <input
+              type="text"
+              value={style.backgroundColor || '#ffffff'}
+              onChange={(e) => handleStyleChange('backgroundColor', e.target.value)}
+              className="flex-grow border border-gray-300 rounded-md p-1.5 text-xs"
+            />
+          </div>
+        </div>
+        
+        {/* Text Color (for text-based blocks) */}
+        {['text', 'heading', 'button'].includes(block.type) && (
+          <div className="mb-2">
+            <label className="block text-xs text-gray-600 mb-1">Metin Rengi</label>
+            <div className="flex items-center">
+              <input
+                type="color"
+                value={style.color || '#000000'}
+                onChange={(e) => handleStyleChange('color', e.target.value)}
+                className="w-8 h-8 border border-gray-300 rounded-md mr-2"
+              />
+              <input
+                type="text"
+                value={style.color || '#000000'}
+                onChange={(e) => handleStyleChange('color', e.target.value)}
+                className="flex-grow border border-gray-300 rounded-md p-1.5 text-xs"
+              />
+            </div>
+          </div>
+        )}
+        
+        {/* Border Radius */}
+        <div className="mb-2">
+          <label className="block text-xs text-gray-600 mb-1">Köşe Yuvarlaklığı (px)</label>
+          <input
+            type="number"
+            value={parseInt(style.borderRadius || '0', 10)}
+            onChange={(e) => handleStyleChange('borderRadius', `${e.target.value}px`)}
+            className="w-full border border-gray-300 rounded-md p-1.5 text-xs"
+          />
+        </div>
+        
+        {/* Font Size (for text-based blocks) */}
+        {['text', 'heading', 'button'].includes(block.type) && (
+          <div className="mb-2">
+            <label className="block text-xs text-gray-600 mb-1">Yazı Boyutu (px)</label>
+            <input
+              type="number"
+              value={parseInt(style.fontSize || '16', 10)}
+              onChange={(e) => handleStyleChange('fontSize', `${e.target.value}px`)}
+              className="w-full border border-gray-300 rounded-md p-1.5 text-xs"
+            />
+          </div>
+        )}
+
+        {/* Flexbox Properties */}
+        <div className="mb-2 mt-4">
+          <h4 className="text-xs font-medium mb-2">Flexbox Ayarları</h4>
+          
+          {/* Display */}
+          <div className="mb-2">
+            <label className="block text-xs text-gray-600 mb-1">Display</label>
+            <select
+              value={style.display || 'block'}
+              onChange={(e) => handleStyleChange('display', e.target.value)}
+              className="w-full border border-gray-300 rounded-md p-1.5 text-xs"
+            >
+              <option value="block">Block</option>
+              <option value="flex">Flex</option>
+              <option value="inline-flex">Inline Flex</option>
+              <option value="inline-block">Inline Block</option>
+              <option value="none">None</option>
+            </select>
+          </div>
+          
+          {/* Only show these options if display is flex or inline-flex */}
+          {(style.display === 'flex' || style.display === 'inline-flex') && (
+            <>
+              {/* Flex Direction */}
+              <div className="mb-3">
+                <div className="flex justify-between items-center mb-1">
+                  <label className="text-xs text-gray-600">flex-direction:</label>
+                  <span className="text-xs text-gray-500">{style.flexDirection || 'row'}</span>
+                </div>
+                <div className="flex justify-between bg-gray-800 rounded-md p-1">
+                  <button
+                    type="button"
+                    className={`flex-1 p-1 rounded ${style.flexDirection === 'row' ? 'bg-blue-500' : 'bg-gray-700'}`}
+                    onClick={() => handleStyleChange('flexDirection', 'row')}
+                    title="Row"
+                  >
+                    <div className="flex items-center justify-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white">
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                        <polyline points="12 5 19 12 12 19"></polyline>
+                      </svg>
+                    </div>
+                  </button>
+                  <button
+                    type="button"
+                    className={`flex-1 p-1 rounded ${style.flexDirection === 'column' ? 'bg-blue-500' : 'bg-gray-700'}`}
+                    onClick={() => handleStyleChange('flexDirection', 'column')}
+                    title="Column"
+                  >
+                    <div className="flex items-center justify-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white transform rotate-90">
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                        <polyline points="12 5 19 12 12 19"></polyline>
+                      </svg>
+                    </div>
+                  </button>
+                  <button
+                    type="button"
+                    className={`flex-1 p-1 rounded ${style.flexDirection === 'row-reverse' ? 'bg-blue-500' : 'bg-gray-700'}`}
+                    onClick={() => handleStyleChange('flexDirection', 'row-reverse')}
+                    title="Row Reverse"
+                  >
+                    <div className="flex items-center justify-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white transform rotate-180">
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                        <polyline points="12 5 19 12 12 19"></polyline>
+                      </svg>
+                    </div>
+                  </button>
+                  <button
+                    type="button"
+                    className={`flex-1 p-1 rounded ${style.flexDirection === 'column-reverse' ? 'bg-blue-500' : 'bg-gray-700'}`}
+                    onClick={() => handleStyleChange('flexDirection', 'column-reverse')}
+                    title="Column Reverse"
+                  >
+                    <div className="flex items-center justify-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white transform -rotate-90">
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                        <polyline points="12 5 19 12 12 19"></polyline>
+                      </svg>
+                    </div>
+                  </button>
+                </div>
+              </div>
+              
+              {/* Flex Wrap */}
+              <div className="mb-3">
+                <div className="flex justify-between items-center mb-1">
+                  <label className="text-xs text-gray-600">flex-wrap:</label>
+                  <span className="text-xs text-gray-500">{style.flexWrap || 'nowrap'}</span>
+                </div>
+                <div className="flex justify-between bg-gray-800 rounded-md p-1">
+                  <button
+                    type="button"
+                    className={`flex-1 p-1 rounded ${style.flexWrap === 'nowrap' ? 'bg-blue-500' : 'bg-gray-700'}`}
+                    onClick={() => handleStyleChange('flexWrap', 'nowrap')}
+                    title="No Wrap"
+                  >
+                    <div className="flex items-center justify-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white">
+                        <rect x="3" y="6" width="18" height="12" rx="2" ry="2"></rect>
+                      </svg>
+                    </div>
+                  </button>
+                  <button
+                    type="button"
+                    className={`flex-1 p-1 rounded ${style.flexWrap === 'wrap' ? 'bg-blue-500' : 'bg-gray-700'}`}
+                    onClick={() => handleStyleChange('flexWrap', 'wrap')}
+                    title="Wrap"
+                  >
+                    <div className="flex items-center justify-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white">
+                        <rect x="3" y="3" width="8" height="8" rx="1" ry="1"></rect>
+                        <rect x="13" y="3" width="8" height="8" rx="1" ry="1"></rect>
+                        <rect x="3" y="13" width="8" height="8" rx="1" ry="1"></rect>
+                      </svg>
+                    </div>
+                  </button>
+                </div>
+              </div>
+              
+              {/* Align Items */}
+              <div className="mb-3">
+                <div className="flex justify-between items-center mb-1">
+                  <label className="text-xs text-gray-600">align-items:</label>
+                  <span className="text-xs text-gray-500">{style.alignItems || 'stretch'}</span>
+                </div>
+                <div className="flex flex-wrap justify-between bg-gray-800 rounded-md p-1">
+                  <button
+                    type="button"
+                    className={`w-10 p-1 rounded ${style.alignItems === 'center' ? 'bg-blue-500' : 'bg-gray-700'}`}
+                    onClick={() => handleStyleChange('alignItems', 'center')}
+                    title="Center"
+                  >
+                    <div className="flex items-center justify-center h-6">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white">
+                        <rect x="6" y="9" width="12" height="6" rx="1" ry="1"></rect>
+                        <line x1="3" y1="3" x2="21" y2="3"></line>
+                        <line x1="3" y1="21" x2="21" y2="21"></line>
+                      </svg>
+                    </div>
+                  </button>
+                  <button
+                    type="button"
+                    className={`w-10 p-1 rounded ${style.alignItems === 'flex-start' ? 'bg-blue-500' : 'bg-gray-700'}`}
+                    onClick={() => handleStyleChange('alignItems', 'flex-start')}
+                    title="Start"
+                  >
+                    <div className="flex items-center justify-center h-6">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white">
+                        <rect x="6" y="3" width="12" height="6" rx="1" ry="1"></rect>
+                        <line x1="3" y1="3" x2="21" y2="3"></line>
+                        <line x1="3" y1="21" x2="21" y2="21"></line>
+                      </svg>
+                    </div>
+                  </button>
+                  <button
+                    type="button"
+                    className={`w-10 p-1 rounded ${style.alignItems === 'flex-end' ? 'bg-blue-500' : 'bg-gray-700'}`}
+                    onClick={() => handleStyleChange('alignItems', 'flex-end')}
+                    title="End"
+                  >
+                    <div className="flex items-center justify-center h-6">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white">
+                        <rect x="6" y="15" width="12" height="6" rx="1" ry="1"></rect>
+                        <line x1="3" y1="3" x2="21" y2="3"></line>
+                        <line x1="3" y1="21" x2="21" y2="21"></line>
+                      </svg>
+                    </div>
+                  </button>
+                  <button
+                    type="button"
+                    className={`w-10 p-1 rounded ${style.alignItems === 'stretch' ? 'bg-blue-500' : 'bg-gray-700'}`}
+                    onClick={() => handleStyleChange('alignItems', 'stretch')}
+                    title="Stretch"
+                  >
+                    <div className="flex items-center justify-center h-6">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white">
+                        <rect x="6" y="4" width="12" height="16" rx="1" ry="1"></rect>
+                        <line x1="3" y1="3" x2="21" y2="3"></line>
+                        <line x1="3" y1="21" x2="21" y2="21"></line>
+                      </svg>
+                    </div>
+                  </button>
+                  <button
+                    type="button"
+                    className={`w-10 p-1 rounded ${style.alignItems === 'baseline' ? 'bg-blue-500' : 'bg-gray-700'}`}
+                    onClick={() => handleStyleChange('alignItems', 'baseline')}
+                    title="Baseline"
+                  >
+                    <div className="flex items-center justify-center h-6">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white">
+                        <line x1="3" y1="12" x2="21" y2="12"></line>
+                        <rect x="5" y="8" width="4" height="8" rx="1" ry="1"></rect>
+                        <rect x="10" y="4" width="4" height="16" rx="1" ry="1"></rect>
+                        <rect x="15" y="6" width="4" height="12" rx="1" ry="1"></rect>
+                      </svg>
+                    </div>
+                  </button>
+                </div>
+              </div>
+              
+              {/* Justify Content */}
+              <div className="mb-3">
+                <div className="flex justify-between items-center mb-1">
+                  <label className="text-xs text-gray-600">justify-content:</label>
+                  <span className="text-xs text-gray-500">{style.justifyContent || 'flex-start'}</span>
+                </div>
+                <div className="flex flex-wrap justify-between bg-gray-800 rounded-md p-1">
+                  <button
+                    type="button"
+                    className={`w-10 p-1 mb-1 rounded ${style.justifyContent === 'flex-start' ? 'bg-blue-500' : 'bg-gray-700'}`}
+                    onClick={() => handleStyleChange('justifyContent', 'flex-start')}
+                    title="Start"
+                  >
+                    <div className="flex items-center justify-center h-6">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white">
+                        <rect x="3" y="9" width="6" height="6" rx="1" ry="1"></rect>
+                        <line x1="3" y1="3" x2="3" y2="21"></line>
+                        <line x1="21" y1="3" x2="21" y2="21"></line>
+                      </svg>
+                    </div>
+                  </button>
+                  <button
+                    type="button"
+                    className={`w-10 p-1 mb-1 rounded ${style.justifyContent === 'center' ? 'bg-blue-500' : 'bg-gray-700'}`}
+                    onClick={() => handleStyleChange('justifyContent', 'center')}
+                    title="Center"
+                  >
+                    <div className="flex items-center justify-center h-6">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white">
+                        <rect x="9" y="9" width="6" height="6" rx="1" ry="1"></rect>
+                        <line x1="3" y1="3" x2="3" y2="21"></line>
+                        <line x1="21" y1="3" x2="21" y2="21"></line>
+                      </svg>
+                    </div>
+                  </button>
+                  <button
+                    type="button"
+                    className={`w-10 p-1 mb-1 rounded ${style.justifyContent === 'flex-end' ? 'bg-blue-500' : 'bg-gray-700'}`}
+                    onClick={() => handleStyleChange('justifyContent', 'flex-end')}
+                    title="End"
+                  >
+                    <div className="flex items-center justify-center h-6">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white">
+                        <rect x="15" y="9" width="6" height="6" rx="1" ry="1"></rect>
+                        <line x1="3" y1="3" x2="3" y2="21"></line>
+                        <line x1="21" y1="3" x2="21" y2="21"></line>
+                      </svg>
+                    </div>
+                  </button>
+                  <button
+                    type="button"
+                    className={`w-10 p-1 mb-1 rounded ${style.justifyContent === 'space-between' ? 'bg-blue-500' : 'bg-gray-700'}`}
+                    onClick={() => handleStyleChange('justifyContent', 'space-between')}
+                    title="Space Between"
+                  >
+                    <div className="flex items-center justify-center h-6">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white">
+                        <rect x="3" y="9" width="4" height="6" rx="1" ry="1"></rect>
+                        <rect x="17" y="9" width="4" height="6" rx="1" ry="1"></rect>
+                        <line x1="3" y1="3" x2="3" y2="21"></line>
+                        <line x1="21" y1="3" x2="21" y2="21"></line>
+                      </svg>
+                    </div>
+                  </button>
+                  <button
+                    type="button"
+                    className={`w-10 p-1 mb-1 rounded ${style.justifyContent === 'space-around' ? 'bg-blue-500' : 'bg-gray-700'}`}
+                    onClick={() => handleStyleChange('justifyContent', 'space-around')}
+                    title="Space Around"
+                  >
+                    <div className="flex items-center justify-center h-6">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white">
+                        <rect x="6" y="9" width="4" height="6" rx="1" ry="1"></rect>
+                        <rect x="14" y="9" width="4" height="6" rx="1" ry="1"></rect>
+                        <line x1="3" y1="3" x2="3" y2="21"></line>
+                        <line x1="21" y1="3" x2="21" y2="21"></line>
+                      </svg>
+                    </div>
+                  </button>
+                  <button
+                    type="button"
+                    className={`w-10 p-1 mb-1 rounded ${style.justifyContent === 'space-evenly' ? 'bg-blue-500' : 'bg-gray-700'}`}
+                    onClick={() => handleStyleChange('justifyContent', 'space-evenly')}
+                    title="Space Evenly"
+                  >
+                    <div className="flex items-center justify-center h-6">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white">
+                        <rect x="7" y="9" width="3" height="6" rx="1" ry="1"></rect>
+                        <rect x="14" y="9" width="3" height="6" rx="1" ry="1"></rect>
+                        <line x1="3" y1="3" x2="3" y2="21"></line>
+                        <line x1="21" y1="3" x2="21" y2="21"></line>
+                      </svg>
+                    </div>
+                  </button>
+                </div>
+              </div>
+              
+              {/* Gap */}
+              <div className="mb-2">
+                <label className="block text-xs text-gray-600 mb-1">Gap (px)</label>
+                <input
+                  type="number"
+                  value={parseInt(style.gap || '0', 10)}
+                  onChange={(e) => handleStyleChange('gap', `${e.target.value}px`)}
+                  className="w-full border border-gray-300 rounded-md p-1.5 text-xs"
+                />
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+      
+      {/* Specific Properties based on block type */}
+      {renderSpecificProperties()}
+      
+      {/* Delete Button */}
+      <div className="mt-4">
+        <button
+          onClick={handleDeleteBlock}
+          className="w-full bg-red-500 hover:bg-red-600 text-white rounded-md py-1.5 px-3 text-xs"
+        >
+          Bloğu Sil
+        </button>
+      </div>
+    </div>
+  );
 }; 

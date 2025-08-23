@@ -51,6 +51,11 @@ const defaultCanvasSettings: CanvasSettings = {
   width: 450,
   height: 600,
   background: '#ffffff',
+  name: '',
+  font: 'Poppins',
+  cornerRadius: 0,
+  shadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+  border: 'none',
   overlay: {
     color: '#000000',
     opacity: 0.5,
@@ -152,6 +157,7 @@ export const useBuilderStore = create<BuilderStore>((set, get) => ({
         block.id === id ? { ...block, size } : block
       ),
     }));
+    get().saveHistory();
   },
   
   updateBlockStyle: (id, style) => {

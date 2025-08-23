@@ -4,7 +4,7 @@
 
 @layer components {
   .btn {
-    @apply px-4 py-2 rounded font-medium transition-colors;
+    @apply px-3 py-1.5 rounded font-medium transition-colors text-sm;
   }
   
   .btn-primary {
@@ -20,7 +20,7 @@
   }
   
   .input {
-    @apply px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent;
+    @apply px-2.5 py-1.5 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm;
   }
   
   .sidebar {
@@ -39,8 +39,12 @@
     background-size: 20px 20px;
   }
   
+  .canvas-wrapper {
+    @apply transition-transform;
+  }
+  
   .block-item {
-    @apply border border-gray-200 rounded-md hover:border-primary-500 hover:shadow-sm cursor-grab bg-white p-2 transition-all;
+    @apply border border-gray-200 rounded-md hover:border-primary-500 hover:shadow-sm cursor-grab bg-white p-1.5 transition-all;
   }
   
   .block-item:hover {
@@ -62,8 +66,8 @@
 
 /* Custom scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {

@@ -39,11 +39,12 @@ import {
 interface BlockRendererProps {
   block: BlockInstance;
   isSelected: boolean;
+  scale?: number;
 }
 
-type ResizeHandle = 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | null;
+type ResizeHandle = 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | 'top' | 'bottom' | 'left' | 'right' | null;
 
-export const BlockRenderer = ({ block, isSelected }: BlockRendererProps) => {
+export const BlockRenderer = ({ block, isSelected, scale = 1 }: BlockRendererProps) => {
   const { selectBlock, moveBlock, resizeBlock, moveGroup, blocks } = useBuilderStore();
   const blockRef = useRef<HTMLDivElement>(null);
   const [resizing, setResizing] = useState<ResizeHandle>(null);
@@ -105,98 +106,141 @@ export const BlockRenderer = ({ block, isSelected }: BlockRendererProps) => {
     }
   };
   
-  // Handle resize start
-  const handleResizeStart = useCallback((e: React.MouseEvent, handle: ResizeHandle) => {
-    e.stopPropagation();
-    e.preventDefault();
-    
-    setResizing(handle);
-    setStartPos({ x: e.clientX, y: e.clientY });
-    setStartSize({ width: block.size.width, height: block.size.height });
-    setStartBlockPos({ x: block.position.x, y: block.position.y });
-    
-    // Add global mouse event listeners
-    document.addEventListener('mousemove', handleResizeMove);
-    document.addEventListener('mouseup', handleResizeEnd);
-  }, [block.size.width, block.size.height, block.position.x, block.position.y]);
-  
-  // Handle resize move
-  const handleResizeMove = useCallback((e: MouseEvent) => {
-    if (!resizing) return;
-    
-    const deltaX = e.clientX - startPos.x;
-    const deltaY = e.clientY - startPos.y;
-    
-    let newWidth = startSize.width;
-    let newHeight = startSize.height;
-    let newX = startBlockPos.x;
-    let newY = startBlockPos.y;
-    
-    switch (resizing) {
-      case 'bottom-right':
-        newWidth = Math.max(20, startSize.width + deltaX);
-        newHeight = Math.max(20, startSize.height + deltaY);
-        break;
-      case 'bottom-left':
-        newWidth = Math.max(20, startSize.width - deltaX);
-        newHeight = Math.max(20, startSize.height + deltaY);
-        newX = startBlockPos.x + (startSize.width - newWidth);
-        break;
-      case 'top-right':
-        newWidth = Math.max(20, startSize.width + deltaX);
-        newHeight = Math.max(20, startSize.height - deltaY);
-        newY = startBlockPos.y + (startSize.height - newHeight);
-        break;
-      case 'top-left':
-        newWidth = Math.max(20, startSize.width - deltaX);
-        newHeight = Math.max(20, startSize.height - deltaY);
-        newX = startBlockPos.x + (startSize.width - newWidth);
-        newY = startBlockPos.y + (startSize.height - newHeight);
-        break;
-    }
-    
-    // Ensure we don't get negative positions
-    newX = Math.max(0, newX);
-    newY = Math.max(0, newY);
-    
-    // Get canvas boundaries
-    const canvasElement = document.querySelector('.canvas');
-    if (canvasElement) {
-      const canvasRect = canvasElement.getBoundingClientRect();
-      
-      // Ensure the block doesn't go beyond the canvas boundaries
-      const maxX = canvasRect.width - newWidth;
-      const maxY = canvasRect.height - newHeight;
-      
-      newX = Math.min(newX, maxX > 0 ? maxX : 0);
-      newY = Math.min(newY, maxY > 0 ? maxY : 0);
-    }
-    
-    // Update position if it changed
-    if (newX !== block.position.x || newY !== block.position.y) {
-      moveBlock(block.id, { x: newX, y: newY });
-    }
-    
-    // Update size
-    resizeBlock(block.id, { width: newWidth, height: newHeight });
-  }, [resizing, startPos.x, startPos.y, startSize.width, startSize.height, startBlockPos.x, startBlockPos.y, block.id, block.position.x, block.position.y, moveBlock, resizeBlock]);
-  
-  // Handle resize end
-  const handleResizeEnd = useCallback(() => {
-    setResizing(null);
-    
-    // Remove global mouse event listeners
-    document.removeEventListener('mousemove', handleResizeMove);
-    document.removeEventListener('mouseup', handleResizeEnd);
-  }, [handleResizeMove]);
-  
-  // Cleanup event listeners on unmount
+  // Define resize functions inside useEffect to avoid circular dependencies
   useEffect(() => {
+    // Handle resize move
+    const handleResizeMove = (e: MouseEvent) => {
+      if (!resizing) return;
+      
+      console.log('Resize move:', resizing);
+      
+      const deltaX = e.clientX - startPos.x;
+      const deltaY = e.clientY - startPos.y;
+      
+      console.log('Delta:', deltaX, deltaY);
+      
+      let newWidth = startSize.width;
+      let newHeight = startSize.height;
+      let newX = startBlockPos.x;
+      let newY = startBlockPos.y;
+      
+      // Apply scale factor to make resizing work correctly with scaled canvas
+      const scaledDeltaX = deltaX / scale;
+      const scaledDeltaY = deltaY / scale;
+      
+      console.log('Scaled delta:', scaledDeltaX, scaledDeltaY);
+      
+      switch (resizing) {
+        case 'bottom-right':
+          newWidth = Math.max(20, startSize.width + scaledDeltaX);
+          newHeight = Math.max(20, startSize.height + scaledDeltaY);
+          break;
+        case 'bottom-left':
+          newWidth = Math.max(20, startSize.width - scaledDeltaX);
+          newHeight = Math.max(20, startSize.height + scaledDeltaY);
+          newX = startBlockPos.x + (startSize.width - newWidth);
+          break;
+        case 'top-right':
+          newWidth = Math.max(20, startSize.width + scaledDeltaX);
+          newHeight = Math.max(20, startSize.height - scaledDeltaY);
+          newY = startBlockPos.y + (startSize.height - newHeight);
+          break;
+        case 'top-left':
+          newWidth = Math.max(20, startSize.width - scaledDeltaX);
+          newHeight = Math.max(20, startSize.height - scaledDeltaY);
+          newX = startBlockPos.x + (startSize.width - newWidth);
+          newY = startBlockPos.y + (startSize.height - newHeight);
+          break;
+        // Add new cases for edge handles
+        case 'top':
+          newHeight = Math.max(20, startSize.height - scaledDeltaY);
+          newY = startBlockPos.y + (startSize.height - newHeight);
+          break;
+        case 'bottom':
+          newHeight = Math.max(20, startSize.height + scaledDeltaY);
+          break;
+        case 'left':
+          newWidth = Math.max(20, startSize.width - scaledDeltaX);
+          newX = startBlockPos.x + (startSize.width - newWidth);
+          break;
+        case 'right':
+          newWidth = Math.max(20, startSize.width + scaledDeltaX);
+          break;
+      }
+      
+      console.log('New size:', newWidth, newHeight);
+      console.log('New position:', newX, newY);
+      
+      // Ensure we don't get negative positions
+      newX = Math.max(0, newX);
+      newY = Math.max(0, newY);
+      
+      // Get canvas boundaries
+      const canvasElement = document.querySelector('.canvas');
+      if (canvasElement) {
+        const canvasRect = canvasElement.getBoundingClientRect();
+        
+        // Ensure the block doesn't go beyond the canvas boundaries
+        const maxX = canvasRect.width / scale - newWidth;
+        const maxY = canvasRect.height / scale - newHeight;
+        
+        newX = Math.min(newX, maxX > 0 ? maxX : 0);
+        newY = Math.min(newY, maxY > 0 ? maxY : 0);
+      }
+      
+      // Update position if it changed
+      if (newX !== block.position.x || newY !== block.position.y) {
+        moveBlock(block.id, { x: newX, y: newY });
+      }
+      
+      // Update size
+      resizeBlock(block.id, { width: newWidth, height: newHeight });
+      
+      console.log('Updated block:', block.id, { width: newWidth, height: newHeight, x: newX, y: newY });
+    };
+    
+    // Handle resize end
+    const handleResizeEnd = () => {
+      console.log('Resize end');
+      setResizing(null);
+      
+      // Remove global mouse event listeners
+      document.removeEventListener('mousemove', handleResizeMove);
+      document.removeEventListener('mouseup', handleResizeEnd);
+    };
+    
+    // Expose handleResizeStart to the component scope
+    (BlockRenderer as any).handleResizeStart = (e: React.MouseEvent, handle: ResizeHandle) => {
+      e.stopPropagation();
+      e.preventDefault();
+      
+      console.log('Resize start:', handle);
+      console.log('Block initial size:', block.size);
+      console.log('Block initial position:', block.position);
+      
+      setResizing(handle);
+      setStartPos({ x: e.clientX, y: e.clientY });
+      setStartSize({ width: block.size.width, height: block.size.height });
+      setStartBlockPos({ x: block.position.x, y: block.position.y });
+      
+      // Add global mouse event listeners
+      document.addEventListener('mousemove', handleResizeMove);
+      document.addEventListener('mouseup', handleResizeEnd);
+    };
+    
+    // Cleanup event listeners on unmount
     return () => {
       document.removeEventListener('mousemove', handleResizeMove);
       document.removeEventListener('mouseup', handleResizeEnd);
     };
-  }, [handleResizeMove, handleResizeEnd]);
+  }, [block, resizing, startPos, startSize, startBlockPos, moveBlock, resizeBlock, scale]);
+  
+  // Local handleResizeStart function that calls the one from useEffect
+  const handleResizeStart = (e: React.MouseEvent, handle: ResizeHandle) => {
+    if ((BlockRenderer as any).handleResizeStart) {
+      (BlockRenderer as any).handleResizeStart(e, handle);
+    }
+  };
   
   // Render the appropriate block component based on block type
   const renderBlockContent = () => {
@@ -312,21 +356,40 @@ export const BlockRenderer = ({ block, isSelected }: BlockRendererProps) => {
       {/* Selection handles with resize functionality */}
       {isSelected && (
         <>
+          {/* Corner resize handles */}
           <div 
-            className="absolute -top-1 -left-1 w-3 h-3 bg-primary-500 rounded-full cursor-nwse-resize z-50" 
+            className="absolute -top-1.5 -left-1.5 w-4 h-4 bg-white border-2 border-primary-500 rounded-full cursor-nwse-resize z-50 hover:bg-primary-100" 
             onMouseDown={(e) => handleResizeStart(e, 'top-left')}
           />
           <div 
-            className="absolute -top-1 -right-1 w-3 h-3 bg-primary-500 rounded-full cursor-nesw-resize z-50" 
+            className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-white border-2 border-primary-500 rounded-full cursor-nesw-resize z-50 hover:bg-primary-100" 
             onMouseDown={(e) => handleResizeStart(e, 'top-right')}
           />
           <div 
-            className="absolute -bottom-1 -left-1 w-3 h-3 bg-primary-500 rounded-full cursor-nesw-resize z-50" 
+            className="absolute -bottom-1.5 -left-1.5 w-4 h-4 bg-white border-2 border-primary-500 rounded-full cursor-nesw-resize z-50 hover:bg-primary-100" 
             onMouseDown={(e) => handleResizeStart(e, 'bottom-left')}
           />
           <div 
-            className="absolute -bottom-1 -right-1 w-3 h-3 bg-primary-500 rounded-full cursor-nwse-resize z-50" 
+            className="absolute -bottom-1.5 -right-1.5 w-4 h-4 bg-white border-2 border-primary-500 rounded-full cursor-nwse-resize z-50 hover:bg-primary-100" 
             onMouseDown={(e) => handleResizeStart(e, 'bottom-right')}
+          />
+          
+          {/* Edge resize handles */}
+          <div 
+            className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 bg-white border-2 border-primary-500 rounded-full cursor-ns-resize z-50 hover:bg-primary-100" 
+            onMouseDown={(e) => handleResizeStart(e, 'top')}
+          />
+          <div 
+            className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-4 h-4 bg-white border-2 border-primary-500 rounded-full cursor-ns-resize z-50 hover:bg-primary-100" 
+            onMouseDown={(e) => handleResizeStart(e, 'bottom')}
+          />
+          <div 
+            className="absolute top-1/2 left-0 -translate-x-1/2 -translate-y-1/2 w-4 h-4 bg-white border-2 border-primary-500 rounded-full cursor-ew-resize z-50 hover:bg-primary-100" 
+            onMouseDown={(e) => handleResizeStart(e, 'left')}
+          />
+          <div 
+            className="absolute top-1/2 right-0 translate-x-1/2 -translate-y-1/2 w-4 h-4 bg-white border-2 border-primary-500 rounded-full cursor-ew-resize z-50 hover:bg-primary-100" 
+            onMouseDown={(e) => handleResizeStart(e, 'right')}
           />
         </>
       )}

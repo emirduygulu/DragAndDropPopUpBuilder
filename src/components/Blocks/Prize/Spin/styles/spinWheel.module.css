@@ -1,22 +1,22 @@
 .spinWheelContainer {
   position: relative;
-  border-radius: 16px;
+  border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   background: #ffffff;
   border: 1px solid #e5e7eb;
+  max-width: 100%;
+  max-height: 100%;
 }
-
-
 
 /* Close Button */
 .closeButton {
   position: absolute;
-  top: 12px;
-  right: 12px;
-  width: 32px;
-  height: 32px;
+  top: 8px;
+  right: 8px;
+  width: 24px;
+  height: 24px;
   background: rgba(255, 255, 255, 0.9);
   border: 1px solid #e5e7eb;
   border-radius: 50%;
@@ -35,7 +35,7 @@
 }
 
 .closeButton span {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: bold;
   color: #6b7280;
   line-height: 1;
@@ -52,9 +52,9 @@
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  padding: 40px;
+  padding: 20px;
   height: 100%;
-  gap: 40px;
+  gap: 20px;
 }
 
 /* Mobile Layout */
@@ -67,9 +67,9 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 30px 20px;
+  padding: 15px;
   height: 100%;
-  gap: 30px;
+  gap: 15px;
 }
 
 /* Content Wrapper */
@@ -101,20 +101,20 @@
 
 .wheelTop {
   order: 1;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
 }
 
 .wheelBottom {
   order: 2;
-  margin-top: 20px;
+  margin-top: 10px;
 }
 
 .wheelCanvas {
   border-radius: 50%;
-  box-shadow: 0 10px 30px rgba(139, 92, 246, 0.2);
+  box-shadow: 0 5px 15px rgba(139, 92, 246, 0.2);
   background: white;
   transition: transform 0.3s ease;
-  border: 3px solid #8b5cf6;
+  border: 2px solid #8b5cf6;
 }
 
 .wheelCanvas:hover {
@@ -124,14 +124,14 @@
 /* Pointer */
 .pointer {
   position: absolute;
-  top: -8px;
+  top: -6px;
   left: 50%;
   transform: translateX(-50%);
   width: 0;
   height: 0;
-  border-left: 12px solid transparent;
-  border-right: 12px solid transparent;
-  border-top: 20px solid #8b5cf6;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-top: 14px solid #8b5cf6;
   z-index: 5;
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
 }
@@ -146,39 +146,37 @@
 }
 
 .headline {
-  font-size: 28px;
-  font-weight: 800;
-  margin: 0 0 16px 0;
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0 0 10px 0;
   line-height: 1.2;
   color: #1f2937;
   letter-spacing: -0.025em;
 }
 
 .description {
-  font-size: 16px;
-  margin: 0 0 32px 0;
-  line-height: 1.6;
+  font-size: 12px;
+  margin: 0 0 15px 0;
+  line-height: 1.4;
   color: #6b7280;
-  max-width: 400px;
-  margin-left: auto;
-  margin-right: auto;
+  max-width: 100%;
 }
 
 /* Form Section */
 .formSection {
-  margin-bottom: 24px;
+  margin-bottom: 15px;
 }
 
 .formField {
-  margin-bottom: 16px;
+  margin-bottom: 10px;
 }
 
 .formInput {
   width: 100%;
-  padding: 16px 20px;
-  border: 2px solid #e5e7eb;
-  border-radius: 12px;
-  font-size: 16px;
+  padding: 8px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 12px;
   background: #f9fafb;
   color: #1f2937;
   transition: all 0.3s ease;
@@ -189,7 +187,7 @@
   outline: none;
   border-color: #8b5cf6;
   background: white;
-  box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.1);
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
 }
 
 .formInput::placeholder {
@@ -199,15 +197,15 @@
 
 /* Consent Checkbox */
 .consentCheckbox {
-  margin-top: 16px;
+  margin-top: 10px;
 }
 
 .consentCheckbox label {
   display: flex;
   align-items: flex-start;
-  gap: 12px;
-  font-size: 14px;
-  line-height: 1.5;
+  gap: 8px;
+  font-size: 11px;
+  line-height: 1.4;
   cursor: pointer;
   color: #6b7280;
 }
@@ -215,30 +213,30 @@
 .consentCheckbox input[type="checkbox"] {
   margin: 0;
   margin-top: 2px;
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
   accent-color: #8b5cf6;
 }
 
 /* Spin Button */
 .spinButton {
   width: 100%;
-  padding: 16px 24px;
+  padding: 8px 16px;
   border: none;
-  border-radius: 12px;
-  font-size: 18px;
+  border-radius: 8px;
+  font-size: 14px;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.3s ease;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  margin-bottom: 20px;
-  box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+  margin-bottom: 10px;
+  box-shadow: 0 4px 10px rgba(139, 92, 246, 0.2);
 }
 
 .spinButton:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(139, 92, 246, 0.4);
+  box-shadow: 0 6px 15px rgba(139, 92, 246, 0.3);
 }
 
 .spinButton:active:not(:disabled) {
@@ -253,10 +251,10 @@
 
 /* Disclaimer */
 .disclaimer {
-  font-size: 12px;
+  font-size: 10px;
   color: #9ca3af;
-  line-height: 1.5;
-  max-width: 400px;
+  line-height: 1.4;
+  max-width: 100%;
   margin: 0 auto;
 }
 
@@ -283,58 +281,58 @@
 
 .resultContent {
   background: white;
-  padding: 40px;
-  border-radius: 20px;
+  padding: 20px;
+  border-radius: 12px;
   text-align: center;
-  max-width: 400px;
+  max-width: 300px;
   width: 90%;
-  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
   animation: slideUp 0.3s ease;
   color: #1f2937;
 }
 
 .resultContent h3 {
-  margin: 0 0 16px 0;
-  font-size: 24px;
-  font-weight: 800;
+  margin: 0 0 10px 0;
+  font-size: 18px;
+  font-weight: 700;
   color: #1f2937;
 }
 
 .resultContent p {
-  margin: 0 0 24px 0;
-  font-size: 16px;
+  margin: 0 0 15px 0;
+  font-size: 14px;
   color: #6b7280;
-  line-height: 1.6;
+  line-height: 1.4;
 }
 
 .prizeValue {
   background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%);
   color: white;
-  padding: 20px;
-  border-radius: 16px;
-  margin: 24px 0;
-  font-size: 20px;
-  font-weight: 800;
-  box-shadow: 0 8px 25px rgba(139, 92, 246, 0.3);
+  padding: 15px;
+  border-radius: 10px;
+  margin: 15px 0;
+  font-size: 16px;
+  font-weight: 700;
+  box-shadow: 0 5px 15px rgba(139, 92, 246, 0.3);
 }
 
 .resultActions {
   display: flex;
-  gap: 12px;
+  gap: 10px;
   justify-content: center;
-  margin-top: 24px;
+  margin-top: 15px;
 }
 
 .closeResultButton {
-  padding: 12px 24px;
+  padding: 8px 16px;
   background: #f3f4f6;
   color: #374151;
   border: none;
-  border-radius: 10px;
+  border-radius: 8px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  font-size: 14px;
+  font-size: 12px;
 }
 
 .closeResultButton:hover {
@@ -366,51 +364,50 @@
 /* Responsive Design */
 @media (max-width: 768px) {
   .headline {
-    font-size: 24px;
-  }
-  
-  .description {
-    font-size: 14px;
-    margin-bottom: 24px;
-  }
-  
-  .contentSection {
-    padding: 0 10px;
-  }
-  
-  .formInput {
-    padding: 14px 16px;
-    font-size: 14px;
-  }
-  
-  .spinButton {
-    padding: 14px 20px;
     font-size: 16px;
   }
   
+  .description {
+    font-size: 11px;
+    margin-bottom: 12px;
+  }
+  
+  .contentSection {
+    padding: 0 5px;
+  }
+  
+  .formInput {
+    padding: 7px 10px;
+    font-size: 11px;
+  }
+  
+  .spinButton {
+    padding: 7px 14px;
+    font-size: 12px;
+  }
+  
   .resultContent {
-    padding: 30px 20px;
-    margin: 20px;
+    padding: 15px;
   }
   
   .resultContent h3 {
-    font-size: 20px;
+    font-size: 16px;
   }
   
   .resultContent p {
-    font-size: 14px;
+    font-size: 12px;
   }
   
   .prizeValue {
-    font-size: 18px;
-    padding: 16px;
+    font-size: 14px;
+    padding: 12px;
   }
 }
 
 /* Desktop specific adjustments */
 @media (min-width: 769px) {
   .desktopLayout .contentSection {
-    padding-left: 20px;
+    padding-left: 10px;
   }
   
   .wheelSection {
@@ -421,7 +418,7 @@
 /* Mobile specific adjustments */
 @media (max-width: 768px) {
   .mobileLayout .wheelSection {
-    margin-bottom: 20px;
+    margin-bottom: 10px;
   }
   
   .mobileLayout .contentSection {
@@ -462,9 +459,9 @@
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 20px;
-  height: 20px;
-  margin: -10px 0 0 -10px;
+  width: 16px;
+  height: 16px;
+  margin: -8px 0 0 -8px;
   border: 2px solid transparent;
   border-top: 2px solid currentColor;
   border-radius: 50%;
@@ -473,17 +470,17 @@
 
 /* Modern scrollbar */
 .contentSection::-webkit-scrollbar {
-  width: 6px;
+  width: 4px;
 }
 
 .contentSection::-webkit-scrollbar-track {
   background: #f1f5f9;
-  border-radius: 3px;
+  border-radius: 2px;
 }
 
 .contentSection::-webkit-scrollbar-thumb {
   background: #cbd5e1;
-  border-radius: 3px;
+  border-radius: 2px;
 }
 
 .contentSection::-webkit-scrollbar-thumb:hover {
